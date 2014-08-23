@@ -26,7 +26,6 @@ import org.jetbrains.jet.plugin.project.ResolveSessionForBodies
 import org.jetbrains.jet.lang.resolve.java.JvmPlatformParameters
 import org.jetbrains.jet.lang.resolve.java.structure.impl.JavaClassImpl
 import com.intellij.openapi.roots.JdkOrderEntry
-import org.jetbrains.kotlin.util.sure
 import org.jetbrains.jet.analyzer.AnalyzerFacade
 import org.jetbrains.jet.analyzer.ResolverForModule
 import org.jetbrains.jet.lang.psi.*
@@ -34,14 +33,16 @@ import org.jetbrains.jet.storage.ExceptionTracker
 import org.jetbrains.jet.lang.resolve.java.structure.JavaClass
 import org.jetbrains.jet.analyzer.ResolverForProject
 import org.jetbrains.jet.analyzer.ModuleContent
-import org.jetbrains.jet.analyzer.PlatformAnalysisParameters
-import org.jetbrains.jet.plugin.caches.resolve
+import com.intellij.psi.search.GlobalSearchScope
 
 fun createModuleResolverProvider(
         project: Project,
         analyzerFacade: AnalyzerFacade<ResolverForModule, JvmPlatformParameters>,
         syntheticFiles: Collection<JetFile>
 ): ModuleResolverProvider {
+    if (!MultiModuleAnalysisInIdea.enabled) {
+        return singleModuleResolverProvider(project, analyzerFacade, syntheticFiles)
+    }
 
     val allModuleInfos = collectAllModuleInfosFromIdeaModel(project).toHashSet()
 
@@ -74,7 +75,7 @@ fun createModuleResolverProvider(
         val analyzer = resolverForProject.resolverForModule(module)
         ResolveSessionForBodies(project, analyzer.lazyResolveSession)
     }
-    return ModuleResolverProvider(
+    return MultiModuleResolverProvider(
             resolverForProject,
             moduleToBodiesResolveSession,
             globalContext.exceptionTracker
@@ -106,14 +107,58 @@ private fun collectAllModuleInfosFromIdeaModel(project: Project): List<IdeaModul
     return collectAllModuleInfos
 }
 
-class ModuleResolverProvider(
+trait ModuleResolverProvider {
+    fun resolverByModule(module: IdeaModuleInfo): ResolverForModule
+    fun resolveSessionForBodiesByModule(module: IdeaModuleInfo): ResolveSessionForBodies
+    val exceptionTracker: ExceptionTracker
+}
+
+class MultiModuleResolverProvider(
         private val resolverForProject: ResolverForProject<IdeaModuleInfo, *>,
         private val bodiesResolveByModule: Map<IdeaModuleInfo, ResolveSessionForBodies>,
-        val exceptionTracker: ExceptionTracker
-) {
-    fun resolverByModule(module: IdeaModuleInfo): ResolverForModule = resolverForProject.resolverForModule(module)
+        override val exceptionTracker: ExceptionTracker
+) : ModuleResolverProvider {
+    override fun resolverByModule(module: IdeaModuleInfo): ResolverForModule = resolverForProject.resolverForModule(module)
 
-    fun resolveSessionForBodiesByModule(module: IdeaModuleInfo) =
+    override fun resolveSessionForBodiesByModule(module: IdeaModuleInfo) =
             //NOTE: if this assert fails in production, additional information can be obtained by logging on the call site
             bodiesResolveByModule[module] ?: throw AssertionError("Requested data for $module not contained in this resolver.")
+}
+
+private fun singleModuleResolverProvider(
+        project: Project,
+        analyzerFacade: AnalyzerFacade<ResolverForModule, JvmPlatformParameters>,
+        syntheticFiles: Collection<JetFile>
+): ModuleResolverProvider {
+    val dummyModuleInfo: IdeaModuleInfo = NotUnderContentRootModuleInfo
+    val globalContext = GlobalContext()
+    val oneModuleResolver = analyzerFacade.setupResolverForProject(
+            globalContext,
+            project,
+            listOf(dummyModuleInfo),
+            { ModuleContent(syntheticFiles, GlobalSearchScope.allScope(project)) },
+            JvmPlatformParameters { dummyModuleInfo }
+    )
+    val resolverForWholeProject = oneModuleResolver.resolverForModule(dummyModuleInfo)
+    val resolveSessionForBodies = ResolveSessionForBodies(project, resolverForWholeProject.lazyResolveSession)
+    return SingleModuleResolverProvider(project, globalContext.exceptionTracker, resolverForWholeProject, resolveSessionForBodies)
+}
+
+private class SingleModuleResolverProvider(
+        val resolveSessionForBodies: Project,
+        override val exceptionTracker: ExceptionTracker,
+        val resolverForWholeProject: ResolverForModule,
+        val resolveSessionForWholeProject: ResolveSessionForBodies)
+: ModuleResolverProvider {
+    override fun resolverByModule(module: IdeaModuleInfo): ResolverForModule {
+        return resolverForWholeProject
+    }
+
+    override fun resolveSessionForBodiesByModule(module: IdeaModuleInfo): ResolveSessionForBodies {
+        return resolveSessionForWholeProject
+    }
+}
+
+object MultiModuleAnalysisInIdea {
+    val enabled: Boolean = false // TODO: please implement proper switch
 }
