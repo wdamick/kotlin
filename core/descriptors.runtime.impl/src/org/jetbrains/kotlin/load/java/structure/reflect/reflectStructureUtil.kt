@@ -35,5 +35,9 @@ private fun calculateVisibility(modifiers: Int): Visibility {
 }
 }
 
+// TODO: can there be primitive types, arrays? Anonymous classes which don't have a FqName?
+private val Class<*>.fqName: FqName
+    get() = getDeclaringClass()?.fqName?.child(Name.identifier(getSimpleName())) ?: FqName(getName())
+
 val Class<*>.classId: ClassId
     get() = getDeclaringClass()?.classId?.createNestedClassId(Name.identifier(getSimpleName())) ?: ClassId.topLevel(FqName(getName()))
