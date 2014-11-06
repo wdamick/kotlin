@@ -811,13 +811,13 @@ public class FunctionCodegen extends ParentCodegenAware {
         endVisit(mv, "bridge method", origin);
     }
 
-    public void genDelegate(FunctionDescriptor functionDescriptor, FunctionDescriptor overriddenDescriptor, StackValue field) {
+    public void genDelegate(@NotNull FunctionDescriptor functionDescriptor, FunctionDescriptor overriddenDescriptor, StackValue field) {
         genDelegate(functionDescriptor, overriddenDescriptor.getOriginal(), (ClassDescriptor) overriddenDescriptor.getContainingDeclaration(), field
         );
     }
 
     public void genDelegate(
-            final FunctionDescriptor delegateFunction,
+            @NotNull final FunctionDescriptor delegateFunction,
             final FunctionDescriptor delegatedTo,
             final ClassDescriptor toClass,
             final StackValue field

@@ -58,8 +58,8 @@ public fun OtherOrigin(element: PsiElement?, descriptor: DeclarationDescriptor?)
 
 public fun OtherOrigin(element: PsiElement?): JvmDeclarationOrigin = OtherOrigin(element, null)
 
-public fun OtherOrigin(descriptor: DeclarationDescriptor?): JvmDeclarationOrigin = OtherOrigin(
-        if (descriptor != null) DescriptorToSourceUtils.descriptorToDeclaration(descriptor) else null, descriptor)
+public fun OtherOrigin(descriptor: DeclarationDescriptor): JvmDeclarationOrigin = OtherOrigin(
+        DescriptorToSourceUtils.descriptorToDeclaration(descriptor), descriptor)
 
 public fun PackageFacade(descriptor: PackageFragmentDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(PACKAGE_FACADE, null, descriptor)
 public fun PackagePart(file: JetFile, descriptor: PackageFragmentDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(PACKAGE_PART, file, descriptor)
