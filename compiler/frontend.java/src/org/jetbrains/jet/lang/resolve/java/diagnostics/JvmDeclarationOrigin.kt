@@ -26,6 +26,7 @@ import org.jetbrains.jet.lang.psi.JetDeclaration
 import org.jetbrains.jet.lang.descriptors.FunctionDescriptor
 import org.jetbrains.jet.lang.resolve.java.diagnostics.JvmDeclarationOriginKind.*
 import org.jetbrains.jet.lang.descriptors.CallableMemberDescriptor
+import org.jetbrains.jet.lang.resolve.DescriptorToSourceUtils
 
 public enum class MemberKind { FIELD; METHOD }
 
@@ -50,14 +51,15 @@ public class JvmDeclarationOrigin(
     }
 }
 
-public fun OtherOrigin(element: PsiElement?, descriptor: DeclarationDescriptor?): JvmDeclarationOrigin =
-        if (element == null && descriptor == null)
-            JvmDeclarationOrigin.NO_ORIGIN
-        else JvmDeclarationOrigin(OTHER, element, descriptor)
+public fun OtherOrigin(element: PsiElement?, descriptor: DeclarationDescriptor?): JvmDeclarationOrigin = when {
+    element == null && descriptor == null -> JvmDeclarationOrigin.NO_ORIGIN
+    else -> JvmDeclarationOrigin(OTHER, element, descriptor)
+}
 
 public fun OtherOrigin(element: PsiElement?): JvmDeclarationOrigin = OtherOrigin(element, null)
 
-public fun OtherOrigin(descriptor: DeclarationDescriptor?): JvmDeclarationOrigin = OtherOrigin(null, descriptor)
+public fun OtherOrigin(descriptor: DeclarationDescriptor?): JvmDeclarationOrigin = OtherOrigin(
+        if (descriptor != null) DescriptorToSourceUtils.descriptorToDeclaration(descriptor) else null, descriptor)
 
 public fun PackageFacade(descriptor: PackageFragmentDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(PACKAGE_FACADE, null, descriptor)
 public fun PackagePart(file: JetFile, descriptor: PackageFragmentDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(PACKAGE_PART, file, descriptor)
