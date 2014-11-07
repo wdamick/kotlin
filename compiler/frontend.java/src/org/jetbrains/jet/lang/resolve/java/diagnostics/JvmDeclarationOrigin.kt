@@ -37,7 +37,7 @@ public enum class JvmDeclarationOriginKind {
     PACKAGE_FACADE
     PACKAGE_PART
     TRAIT_IMPL
-    DELEGATION_TO_TRAIT_IMPL
+    DELEGATION
     SYNTHETIC // this means that there's no proper descriptor for this jvm declaration
 }
 
@@ -65,7 +65,8 @@ public fun PackageFacade(descriptor: PackageFragmentDescriptor): JvmDeclarationO
 public fun PackagePart(file: JetFile, descriptor: PackageFragmentDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(PACKAGE_PART, file, descriptor)
 
 public fun TraitImpl(element: JetClassOrObject, descriptor: ClassDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(TRAIT_IMPL, element, descriptor)
-public fun DelegationToTraitImpl(element: PsiElement?, descriptor: FunctionDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(DELEGATION_TO_TRAIT_IMPL, element, descriptor)
+public fun Delegation(descriptor: FunctionDescriptor): JvmDeclarationOrigin =
+        JvmDeclarationOrigin(DELEGATION, DescriptorToSourceUtils.descriptorToDeclaration(descriptor), descriptor)
 
 public fun Synthetic(element: PsiElement?, descriptor: CallableMemberDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(SYNTHETIC, element, descriptor)
 

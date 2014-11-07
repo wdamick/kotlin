@@ -42,7 +42,7 @@ class BuilderFactoryForDuplicateSignatureDiagnostics(
     private val typeMapper = JetTypeMapper(bindingContext, ClassBuilderMode.LIGHT_CLASSES)
 
     override fun handleClashingSignatures(data: ConflictingJvmDeclarationsData) {
-        val allDelegatedToTraitImpls = data.signatureOrigins.all { it.originKind == JvmDeclarationOriginKind.DELEGATION_TO_TRAIT_IMPL }
+        val allDelegatedToTraitImpls = data.signatureOrigins.all { it.originKind == JvmDeclarationOriginKind.DELEGATION }
 
         val elements = LinkedHashSet<PsiElement>()
         for (origin in data.signatureOrigins) {

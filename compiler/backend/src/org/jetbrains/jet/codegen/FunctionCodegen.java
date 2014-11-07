@@ -76,6 +76,7 @@ import static org.jetbrains.jet.lang.resolve.DescriptorUtils.isFunctionLiteral;
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.isTrait;
 import static org.jetbrains.jet.lang.resolve.java.AsmTypeConstants.OBJECT_TYPE;
 import static org.jetbrains.jet.lang.resolve.java.JvmAnnotationNames.OLD_JET_VALUE_PARAMETER_ANNOTATION;
+import static org.jetbrains.jet.lang.resolve.java.diagnostics.DiagnosticsPackage.Delegation;
 import static org.jetbrains.jet.lang.resolve.java.diagnostics.DiagnosticsPackage.OtherOrigin;
 import static org.jetbrains.jet.lang.resolve.java.diagnostics.DiagnosticsPackage.Synthetic;
 import static org.jetbrains.org.objectweb.asm.Opcodes.*;
@@ -825,7 +826,7 @@ public class FunctionCodegen extends ParentCodegenAware {
         final JvmMethodSignature jvmDelegateMethodSignature = typeMapper.mapSignature(delegateFunction);
         final JvmMethodSignature jvmDelegateToMethodSignature = typeMapper.mapSignature(delegatedTo);
         generateMethod(
-                OtherOrigin(delegateFunction), jvmDelegateMethodSignature, delegateFunction,
+                Delegation(delegateFunction), jvmDelegateMethodSignature, delegateFunction,
                 new FunctionGenerationStrategy() {
                     @Override
                     public void generateBody(
