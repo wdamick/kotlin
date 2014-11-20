@@ -23,7 +23,7 @@ import org.jetbrains.jet.codegen.ExpressionCodegen
 import org.jetbrains.jet.codegen.StackValue
 import org.jetbrains.jet.lang.psi.JetExpression
 
-import org.jetbrains.jet.codegen.AsmUtil.genToString
+import org.jetbrains.jet.codegen.AsmUtil
 
 public class ToString : LazyIntrinsicMethod() {
     override fun generateImpl(codegen: ExpressionCodegen,
@@ -31,6 +31,6 @@ public class ToString : LazyIntrinsicMethod() {
                               element: PsiElement?,
                               arguments: List<JetExpression>,
                               receiver: StackValue): StackValue {
-        return genToString(receiver, receiver.type)
+        return AsmUtil.genToString(receiver, receiver.type)
     }
 }

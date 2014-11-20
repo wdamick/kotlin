@@ -24,15 +24,14 @@ import org.jetbrains.jet.codegen.StackValue
 import org.jetbrains.jet.lang.psi.JetExpression
 
 import org.jetbrains.org.objectweb.asm.Opcodes.*
-import org.jetbrains.jet.codegen.AsmUtil.isPrimitive
-import org.jetbrains.jet.codegen.AsmUtil.numberFunctionOperandType
+import org.jetbrains.jet.codegen.AsmUtil
 
 public class BinaryOp(private val opcode: Int) : IntrinsicMethod() {
 
     override fun generateImpl(codegen: ExpressionCodegen, v: InstructionAdapter, returnType: Type, element: PsiElement?, arguments: List<JetExpression>, receiver: StackValue): Type {
-        assert(isPrimitive(returnType)) { "Return type of BinaryOp intrinsic should be of primitive type : " + returnType }
+        assert(AsmUtil.isPrimitive(returnType)) { "Return type of BinaryOp intrinsic should be of primitive type : " + returnType }
 
-        val operandType = numberFunctionOperandType(returnType)
+        val operandType = AsmUtil.numberFunctionOperandType(returnType)
 
         if (arguments.size() == 1) {
             // Intrinsic is called as an ordinary function

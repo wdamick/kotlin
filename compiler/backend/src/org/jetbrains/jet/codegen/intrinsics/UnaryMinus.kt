@@ -22,7 +22,7 @@ import org.jetbrains.jet.codegen.ExpressionCodegen
 import org.jetbrains.jet.codegen.StackValue
 import org.jetbrains.jet.lang.psi.JetExpression
 
-import org.jetbrains.jet.codegen.AsmUtil.*
+import org.jetbrains.jet.codegen.AsmUtil
 
 public class UnaryMinus : LazyIntrinsicMethod() {
 
@@ -31,9 +31,9 @@ public class UnaryMinus : LazyIntrinsicMethod() {
                               element: PsiElement?,
                               arguments: List<JetExpression>,
                               receiver: StackValue): StackValue {
-        assert(isPrimitive(returnType)) { "Return type of UnaryMinus intrinsic should be of primitive type: " + returnType }
+        assert(AsmUtil.isPrimitive(returnType)) { "Return type of UnaryMinus intrinsic should be of primitive type: " + returnType }
 
-        val operandType = numberFunctionOperandType(returnType)
+        val operandType = AsmUtil.numberFunctionOperandType(returnType)
 
         val newreceiver = if (arguments.size() == 1) codegen.gen(arguments.get(0)) else receiver
 

@@ -18,15 +18,14 @@ package org.jetbrains.jet.codegen.intrinsics
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.org.objectweb.asm.Type
-import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 import org.jetbrains.jet.codegen.ExpressionCodegen
 import org.jetbrains.jet.codegen.StackValue
 import org.jetbrains.jet.lang.psi.JetCallExpression
 import org.jetbrains.jet.lang.psi.JetExpression
 import org.jetbrains.jet.lexer.JetTokens
 
-import org.jetbrains.jet.codegen.AsmUtil.genEqualsForExpressionsOnStack
 import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants.OBJECT_TYPE
+import org.jetbrains.jet.codegen.AsmUtil
 
 public class Equals : LazyIntrinsicMethod() {
     override fun generateImpl(codegen: ExpressionCodegen,
@@ -45,6 +44,6 @@ public class Equals : LazyIntrinsicMethod() {
             rightExpr = arguments.get(1)
         }
 
-        return genEqualsForExpressionsOnStack(JetTokens.EQEQ, leftExpr, codegen.genLazy(rightExpr, OBJECT_TYPE))
+        return AsmUtil.genEqualsForExpressionsOnStack(JetTokens.EQEQ, leftExpr, codegen.genLazy(rightExpr, OBJECT_TYPE))
     }
 }

@@ -22,13 +22,12 @@ import org.jetbrains.jet.codegen.StackValue
 import org.jetbrains.jet.lang.psi.JetExpression
 import org.jetbrains.org.objectweb.asm.Type
 
-import org.jetbrains.jet.codegen.AsmUtil.genIncrement
-import org.jetbrains.jet.codegen.AsmUtil.isPrimitive
+import org.jetbrains.jet.codegen.AsmUtil
 
 public class Increment(private val myDelta: Int) : LazyIntrinsicMethod() {
 
     override fun generateImpl(codegen: ExpressionCodegen, returnType: Type, element: PsiElement?, arguments: List<JetExpression>, receiver: StackValue): StackValue {
-        assert(isPrimitive(returnType)) { "Return type of Increment intrinsic should be of primitive type : " + returnType }
+        assert(AsmUtil.isPrimitive(returnType)) { "Return type of Increment intrinsic should be of primitive type : " + returnType }
 
         if (arguments.size() > 0) {
             val operand = arguments.get(0)
@@ -43,7 +42,7 @@ public class Increment(private val myDelta: Int) : LazyIntrinsicMethod() {
         else {
             return StackValue.operation(returnType) {
                 receiver.put(returnType, it)
-                genIncrement(returnType, myDelta, it)
+                AsmUtil.genIncrement(returnType, myDelta, it)
             }
         }
     }
