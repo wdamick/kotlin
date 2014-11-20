@@ -544,12 +544,6 @@ public class AsmUtil {
         v.add(expectedType);
     }
 
-    public static Type genNegate(Type expectedType, InstructionAdapter v) {
-        expectedType = numberFunctionOperandType(expectedType);
-        v.neg(expectedType);
-        return expectedType;
-    }
-
     public static void swap(InstructionAdapter v, Type stackTop, Type afterTop) {
         if (stackTop.getSize() == 1) {
             if (afterTop.getSize() == 1) {
