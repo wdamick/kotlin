@@ -258,6 +258,7 @@ private fun generatorForBodyResolve() =
             parameter(javaClass<BindingTrace>())
             parameter(javaClass<ModuleDescriptor>(), useAsContext = true)
             parameter(javaClass<AdditionalCheckerProvider>())
+            parameter(javaClass<PartialBodyResolveProvider>())
 
             publicField(javaClass<BodyResolver>())
         }
