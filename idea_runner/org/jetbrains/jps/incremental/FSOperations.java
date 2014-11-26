@@ -98,6 +98,10 @@ public class FSOperations {
   }
 
   public static void markDirtyRecursively(CompileContext context, ModuleChunk chunk) throws IOException {
+    markDirtyRecursively(context, chunk, null);
+  }
+
+  public static void markDirtyRecursively(CompileContext context, ModuleChunk chunk, @Nullable FileFilter filter) throws IOException {
     Set<JpsModule> modules = chunk.getModules();
     Set<ModuleBuildTarget> targets = chunk.getTargets();
     final Set<ModuleBuildTarget> dirtyTargets = new HashSet<ModuleBuildTarget>(targets);
@@ -130,7 +134,7 @@ public class FSOperations {
 
     final Timestamps timestamps = context.getProjectDescriptor().timestamps.getStorage();
     for (ModuleBuildTarget target : dirtyTargets) {
-      markDirtyFiles(context, target, timestamps, true, null, null);
+      markDirtyFiles(context, target, timestamps, true, null, filter);
     }
 
     if (JavaBuilderUtil.isCompileJavaIncrementally(context)) {
