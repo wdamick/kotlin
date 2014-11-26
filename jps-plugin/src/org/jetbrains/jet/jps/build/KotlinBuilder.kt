@@ -150,11 +150,16 @@ public class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR
         if (IncrementalCompilation.ENABLED) {
             if (recompilationDecision == IncrementalCacheImpl.RecompilationDecision.RECOMPILE_ALL) {
                 allCompiledFiles.clear()
-                return CHUNK_REBUILD_REQUIRED
+                val targetsCompletelyMarkedDirty = FSOperations.getTargetsCompletelyMarkedDirty(context)
+                if (chunk.getTargets().all { it in targetsCompletelyMarkedDirty }) {
+                    return OK
+                }
+                else {
+                    FSOperations.markDirtyRecursively(context, chunk)
+                }
             }
             if (recompilationDecision == IncrementalCacheImpl.RecompilationDecision.COMPILE_OTHERS) {
-                // TODO should mark dependencies as dirty, as well
-                FSOperations.markDirty(context, chunk, { file ->
+                FSOperations.markDirtyRecursively(context, chunk, { file ->
                     KotlinSourceFileCollector.isKotlinSourceFile(file) && file !in allCompiledFiles
                 })
             }
