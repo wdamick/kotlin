@@ -8,6 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="idea_runner" />
     <orderEntry type="module" module-name="ide-compiler-runner" />
     <orderEntry type="module" module-name="cli-common" />
     <orderEntry type="module" module-name="util" />
@@ -23,4 +24,3 @@
     <orderEntry type="library" name="asm" level="project" />
   </component>
 </module>
-
