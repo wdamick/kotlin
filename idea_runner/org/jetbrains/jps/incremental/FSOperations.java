@@ -46,6 +46,7 @@ import java.util.Set;
  */
 public class FSOperations {
   public static final GlobalContextKey<Set<File>> ALL_OUTPUTS_KEY = GlobalContextKey.create("_all_project_output_dirs_");
+  public static final GlobalContextKey<Set<BuildTarget<?>>> TARGETS_COMPLETELY_MARKED_DIRTY = GlobalContextKey.create("_targets_completely_marked_dirty_"); // TODO global context key or just key?
 
   /**
    * @param context
@@ -92,6 +93,9 @@ public class FSOperations {
 
   public static void markDirty(CompileContext context, final ModuleChunk chunk, @Nullable FileFilter filter) throws IOException {
     final ProjectDescriptor pd = context.getProjectDescriptor();
+    if (filter == null) {
+      getTargetsCompletelyMarkedDirty(context).addAll(chunk.getTargets());
+    }
     for (ModuleBuildTarget target : chunk.getTargets()) {
       markDirtyFiles(context, target, pd.timestamps.getStorage(), true, null, filter);
     }
@@ -133,6 +137,9 @@ public class FSOperations {
     }
 
     final Timestamps timestamps = context.getProjectDescriptor().timestamps.getStorage();
+    if (filter == null) {
+      getTargetsCompletelyMarkedDirty(context).addAll(dirtyTargets);
+    }
     for (ModuleBuildTarget target : dirtyTargets) {
       markDirtyFiles(context, target, timestamps, true, null, filter);
     }
@@ -168,7 +175,7 @@ public class FSOperations {
     for (BuildRootDescriptor rd : context.getProjectDescriptor().getBuildRootIndex().getTargetRoots(target, context)) {
       if (!rd.getRootFile().exists() ||
           //temp roots are managed by compilers themselves
-          (rd instanceof JavaSourceRootDescriptor && ((JavaSourceRootDescriptor)rd).isTemp)) {
+          (rd instanceof JavaSourceRootDescriptor && ((JavaSourceRootDescriptor) rd).isTemp)) {
         continue;
       }
       if (filter == null) {
@@ -244,5 +251,14 @@ public class FSOperations {
       toDelete = additionalDirs;
       additionalDirs = null;
     }
+  }
+
+  public static Set<BuildTarget<?>> getTargetsCompletelyMarkedDirty(CompileContext context) {
+    Set<BuildTarget<?>> targetsCompletelyMarkedDirty = TARGETS_COMPLETELY_MARKED_DIRTY.get(context);
+    if (targetsCompletelyMarkedDirty == null) {
+      targetsCompletelyMarkedDirty = new HashSet<BuildTarget<?>>();
+      TARGETS_COMPLETELY_MARKED_DIRTY.set(context, targetsCompletelyMarkedDirty);
+    }
+    return targetsCompletelyMarkedDirty;
   }
 }
