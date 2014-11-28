@@ -145,7 +145,14 @@ public class DescriptorResolver {
         descriptor.setTypeParameterDescriptors(typeParameterDescriptors);
         Modality defaultModality = descriptor.getKind() == ClassKind.TRAIT ? Modality.ABSTRACT : Modality.FINAL;
         descriptor.setModality(resolveModalityFromModifiers(classElement, defaultModality));
-        descriptor.setVisibility(resolveVisibilityFromModifiers(classElement, getDefaultClassVisibility(descriptor)));
+
+        DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
+        if (containingDeclaration instanceof ClassifierDescriptor || containingDeclaration instanceof PackageFragmentDescriptor) {
+            descriptor.setVisibility(resolveVisibilityFromModifiers(classElement, getDefaultClassVisibility(descriptor)));
+        }
+        else {
+            descriptor.setVisibility(Visibilities.LOCAL);
+        }
 
         trace.record(BindingContext.CLASS, classElement, descriptor);
     }
