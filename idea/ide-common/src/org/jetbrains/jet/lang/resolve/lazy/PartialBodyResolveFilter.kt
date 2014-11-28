@@ -285,7 +285,7 @@ class PartialBodyResolveFilter(
             }
 
             override fun visitIfExpression(expression: JetIfExpression) {
-                expression.getCondition().accept(this)
+                expression.getCondition()?.accept(this)
 
                 val thenBranch = expression.getThen()
                 val elseBranch = expression.getElse()
@@ -307,7 +307,7 @@ class PartialBodyResolveFilter(
             }
 
             override fun visitWhileExpression(loop: JetWhileExpression) {
-                val condition = loop.getCondition()
+                val condition = loop.getCondition() ?: return
                 if (condition.isTrueConstant()) {
                     insideLoopLevel++
                     loop.getBody()?.accept(this)
@@ -315,7 +315,7 @@ class PartialBodyResolveFilter(
                 }
                 else {
                     // do not make sense to search exits inside while-loop as not necessary enter it at all
-                    condition?.accept(this)
+                    condition.accept(this)
                 }
             }
 
