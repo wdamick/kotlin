@@ -28,6 +28,8 @@ import static org.jetbrains.jet.lang.diagnostics.PositioningStrategies.DECLARATI
 import static org.jetbrains.jet.lang.diagnostics.PositioningStrategies.DECLARATION_SIGNATURE_OR_DEFAULT;
 import static org.jetbrains.jet.lang.diagnostics.Severity.ERROR;
 
+import static org.jetbrains.k2js.resolve.diagnostics.DiagnosticsPackage.*;
+
 public interface ErrorsJs {
 
     DiagnosticFactory1<JetElement, JetType> NATIVE_ANNOTATIONS_ALLOWED_ONLY_ON_MEMBER_OR_EXTENSION_FUN = DiagnosticFactory1.create(ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
