@@ -31,6 +31,9 @@ import com.intellij.util.Processor
 import org.jetbrains.jet.plugin.JetBundle
 import com.intellij.codeInspection.deadCode.UnusedDeclarationInspection
 import org.jetbrains.jet.asJava.LightClassUtil
+import org.jetbrains.jet.plugin.findUsages.handlers.KotlinFindClassUsagesHandler
+import com.intellij.psi.search.GlobalSearchScope
+import org.jetbrains.jet.plugin.findUsages.KotlinFindUsagesHandlerFactory
 
 
 public class UnusedSymbolInspection : AbstractKotlinInspection() {
@@ -46,8 +49,10 @@ public class UnusedSymbolInspection : AbstractKotlinInspection() {
                 val lightClass = LightClassUtil.getPsiClass(klass)
                 if (lightClass != null && javaInspection.isEntryPoint(lightClass)) return
 
+                val classUseScope = klass.getUseScope()
+
                 val usagesSearchHelper = KotlinClassFindUsagesOptions(holder.getProject()).toClassHelper()
-                val request = usagesSearchHelper.newRequest(UsagesSearchTarget(klass, klass.getUseScope()))
+                val request = usagesSearchHelper.newRequest(UsagesSearchTarget(klass, classUseScope))
                 val query = UsagesSearch.search(request)
 
                 var foundNonTrivialUsage = false
@@ -60,6 +65,16 @@ public class UnusedSymbolInspection : AbstractKotlinInspection() {
                         false
                     }
                 })
+
+                // Finding text usages
+                if (classUseScope is GlobalSearchScope) {
+                    val findClassUsagesHandler = KotlinFindClassUsagesHandler(klass, KotlinFindUsagesHandlerFactory(klass.getProject()))
+                    findClassUsagesHandler.processUsagesInText(
+                            klass,
+                            { foundNonTrivialUsage = true; false },
+                            classUseScope
+                    )
+                }
 
                 if (!foundNonTrivialUsage) {
                     holder.registerProblem(
