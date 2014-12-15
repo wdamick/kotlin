@@ -28,7 +28,7 @@ import org.jetbrains.jet.lang.resolve.scopes.receivers.ExpressionReceiver
 import org.jetbrains.jet.lang.resolve.calls.util.CallMaker
 import org.jetbrains.jet.lang.resolve.calls.context.ContextDependency
 import org.jetbrains.jet.lang.resolve.calls.context.CheckValueArgumentsMode
-import org.jetbrains.jet.lang.resolve.calls.CompositeExtension
+import org.jetbrains.jet.lang.resolve.calls.CompositeCallChecker
 import org.jetbrains.jet.di.InjectorForMacros
 import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResults
 import org.jetbrains.jet.lang.descriptors.FunctionDescriptor
@@ -171,7 +171,7 @@ class ExpectedInfos(val bindingContext: BindingContext, val resolutionFacade: Re
                 dataFlowInfo,
                 ContextDependency.INDEPENDENT,
                 CheckValueArgumentsMode.ENABLED,
-                CompositeExtension(listOf()),
+                CompositeCallChecker(listOf()),
                 false).replaceCollectAllCandidates(true)
         val callResolver = InjectorForMacros(
                 callElement.getProject(),

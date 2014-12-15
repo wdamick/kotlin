@@ -416,8 +416,8 @@ public class ExpressionTypingServices {
         }
     }
 
-    @NotNull
-    public CallChecker createExtension(@NotNull JetScope scope, boolean isAnnotationContext) {
-        return extensionProvider.createExtension(scope == JetScope.Empty.INSTANCE$ ? null : scope.getContainingDeclaration(), isAnnotationContext);
+    public CallChecker getCallChecker() {
+        List<CallChecker> checkers = expressionTypingComponents.additionalCheckerProvider.getCallCheckers();
+        return new CompositeCallChecker(checkers);
     }
 }

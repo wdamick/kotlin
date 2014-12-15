@@ -23,11 +23,11 @@ import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCall;
 
 import java.util.List;
 
-public class CompositeExtension implements CallChecker {
+public class CompositeCallChecker implements CallChecker {
 
     private final List<CallChecker> extensions;
 
-    public CompositeExtension(@NotNull List<CallChecker> extensions) {
+    public CompositeCallChecker(@NotNull List<CallChecker> extensions) {
         this.extensions = extensions;
     }
 
