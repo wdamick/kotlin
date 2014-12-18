@@ -40,6 +40,8 @@ import org.jetbrains.jet.plugin.findUsages.toHelper
 import org.jetbrains.jet.lang.psi.JetNamedDeclaration
 import com.intellij.psi.PsiElement
 import org.jetbrains.jet.lexer.JetTokens
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 public class UnusedSymbolInspection : AbstractKotlinInspection() {
@@ -77,6 +79,14 @@ public class UnusedSymbolInspection : AbstractKotlinInspection() {
                 ) // TODO add quick fix to delete it
             }
         }
+    }
+
+    override fun inspectionStarted(session: LocalInspectionToolSession, isOnTheFly: Boolean) {
+        println("unused symbol inspection started for: ${session.getFile().getName()} " + SimpleDateFormat().format(Date()))
+    }
+
+    override fun inspectionFinished(session: LocalInspectionToolSession) {
+        println("unused symbol inspection finished for: ${session.getFile().getName()}" + SimpleDateFormat().format(Date()))
     }
 
     private fun isEntryPoint(declaration: JetNamedDeclaration): Boolean {
