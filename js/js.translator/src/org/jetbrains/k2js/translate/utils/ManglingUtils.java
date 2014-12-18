@@ -31,7 +31,7 @@ import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import java.util.*;
 
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.getFqName;
-import static org.jetbrains.k2js.translate.utils.TranslationUtils.getJetTypeFqName;
+import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getJetTypeFqName;
 
 public class ManglingUtils {
     private ManglingUtils() {}

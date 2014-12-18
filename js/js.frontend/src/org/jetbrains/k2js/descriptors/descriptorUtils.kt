@@ -20,6 +20,10 @@ import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns
 import org.jetbrains.jet.lang.resolve.name.Name
 import org.jetbrains.jet.lang.types.JetType
 import org.jetbrains.jet.lang.descriptors.ClassifierDescriptor
+import org.jetbrains.jet.lang.descriptors.TypeParameterDescriptor
+import com.intellij.openapi.util.text.StringUtil
+import org.jetbrains.jet.lang.types.TypeProjection
+import org.jetbrains.jet.lang.resolve.DescriptorUtils
 
 public val JetType.nameIfStandardType: Name?
     get() {
@@ -31,3 +35,25 @@ public val JetType.nameIfStandardType: Name?
 
         return null
     }
+
+public fun JetType.getJetTypeFqName(printTypeArguments: Boolean): String {
+    val declaration = getConstructor().getDeclarationDescriptor()
+    assert(declaration != null)
+
+    if (declaration is TypeParameterDescriptor) {
+        return StringUtil.join(declaration.getUpperBounds(), { (type) -> type.getJetTypeFqName(printTypeArguments) }, "&")
+    }
+
+    val typeArguments = getArguments()
+    val typeArgumentsAsString: String
+
+    if (printTypeArguments && !typeArguments.isEmpty()) {
+        val joinedTypeArguments = StringUtil.join(typeArguments, { (projection) -> projection.getType().getJetTypeFqName(false) }, ", ")
+
+        typeArgumentsAsString = "<" + joinedTypeArguments + ">"
+    } else {
+        typeArgumentsAsString = ""
+    }
+
+    return DescriptorUtils.getFqName(declaration).asString() + typeArgumentsAsString
+}

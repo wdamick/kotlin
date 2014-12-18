@@ -24,12 +24,12 @@ import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.OverrideResolver;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.plugin.JetLanguage;
-import org.jetbrains.k2js.translate.utils.TranslationUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getNameIfStandardType;
+import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getJetTypeFqName;
 
 public final class PatternBuilder {
 
@@ -242,7 +242,7 @@ public final class PatternBuilder {
             if (actualReceiver != null) {
                 if (receiverFqName == null) return false;
 
-                String actualReceiverFqName = TranslationUtils.getJetTypeFqName(actualReceiver.getType(), false);
+                String actualReceiverFqName = getJetTypeFqName(actualReceiver.getType(), false);
 
                 if (!actualReceiverFqName.equals(receiverFqName)) return false;
             }
