@@ -36,8 +36,6 @@ import org.jetbrains.jet.lang.types.lang.InlineStrategy;
 import org.jetbrains.jet.lang.types.lang.InlineUtil;
 import org.jetbrains.k2js.translate.callTranslator.CallTranslator;
 import org.jetbrains.k2js.translate.context.TranslationContext;
-import org.jetbrains.k2js.descriptors.DescriptorPredicate;
-import org.jetbrains.k2js.descriptors.PatternBuilder;
 import org.jetbrains.k2js.resolve.diagnostics.ErrorsJs;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,11 +50,9 @@ import java.util.List;
 import static com.google.gwt.dev.js.rhino.Utils.isEndOfLine;
 import static org.jetbrains.jet.lang.resolve.calls.callUtil.CallUtilPackage.getFunctionResolvedCallWithAssert;
 import static org.jetbrains.k2js.translate.utils.BindingUtils.getCompileTimeValue;
+import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getJS_PATTERN;
 
 public final class CallExpressionTranslator extends AbstractCallExpressionTranslator {
-
-    @NotNull
-    private final static DescriptorPredicate JSCODE_PATTERN = PatternBuilder.pattern("kotlin.js.js(String)");
 
     @NotNull
     public static JsNode translate(
@@ -113,7 +109,7 @@ public final class CallExpressionTranslator extends AbstractCallExpressionTransl
         FunctionDescriptor descriptor = getFunctionResolvedCallWithAssert(expression, context.bindingContext())
                                             .getResultingDescriptor();
 
-        return JSCODE_PATTERN.apply(descriptor) && expression.getValueArguments().size() == 1;
+        return getJS_PATTERN().apply(descriptor);
     }
 
     private CallExpressionTranslator(
