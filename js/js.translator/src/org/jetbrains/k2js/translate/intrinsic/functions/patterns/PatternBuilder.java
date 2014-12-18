@@ -23,7 +23,7 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.OverrideResolver;
 import org.jetbrains.jet.lang.resolve.name.Name;
-import org.jetbrains.k2js.translate.context.Namer;
+import org.jetbrains.jet.plugin.JetLanguage;
 import org.jetbrains.k2js.translate.utils.JsDescriptorUtils;
 import org.jetbrains.k2js.translate.utils.TranslationUtils;
 
@@ -36,7 +36,7 @@ public final class PatternBuilder {
     private static final NamePredicate KOTLIN_NAME_PREDICATE = new NamePredicate("kotlin");
 
     @NotNull
-    private static final Name KOTLIN_NAME = Name.identifier(Namer.KOTLIN_LOWER_NAME);
+    private static final Name KOTLIN_NAME = Name.identifier(JetLanguage.NAME.toLowerCase());
 
     private PatternBuilder() {
     }
