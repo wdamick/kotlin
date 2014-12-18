@@ -24,11 +24,12 @@ import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.OverrideResolver;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.plugin.JetLanguage;
-import org.jetbrains.k2js.translate.utils.JsDescriptorUtils;
 import org.jetbrains.k2js.translate.utils.TranslationUtils;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getNameIfStandardType;
 
 public final class PatternBuilder {
 
@@ -161,7 +162,7 @@ public final class PatternBuilder {
                     }
                     for (int i = 0; i < valueParameterDescriptors.size(); i++) {
                         ValueParameterDescriptor valueParameterDescriptor = valueParameterDescriptors.get(i);
-                        Name name = JsDescriptorUtils.getNameIfStandardType(valueParameterDescriptor.getType());
+                        Name name = getNameIfStandardType(valueParameterDescriptor.getType());
                         NamePredicate namePredicate = argumentCheckers.get(i);
                         if (!namePredicate.apply(name)) return false;
                     }

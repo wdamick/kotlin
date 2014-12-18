@@ -34,9 +34,9 @@ import org.jetbrains.k2js.translate.utils.BindingUtils;
 import org.jetbrains.k2js.translate.utils.JsAstUtils;
 import org.jetbrains.k2js.translate.utils.TranslationUtils;
 
+import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getNameIfStandardType;
 import static org.jetbrains.k2js.translate.utils.BindingUtils.getTypeByReference;
 import static org.jetbrains.k2js.translate.utils.JsAstUtils.*;
-import static org.jetbrains.k2js.translate.utils.JsDescriptorUtils.getNameIfStandardType;
 
 public final class PatternTranslator extends AbstractTranslator {
 
