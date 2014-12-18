@@ -35,15 +35,15 @@ import org.jetbrains.k2js.translate.callTranslator.CallInfo;
 import org.jetbrains.k2js.translate.context.Namer;
 import org.jetbrains.k2js.translate.context.TranslationContext;
 import org.jetbrains.k2js.translate.intrinsic.functions.basic.FunctionIntrinsic;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.DescriptorPredicate;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.NamePredicate;
+import org.jetbrains.k2js.descriptors.DescriptorPredicate;
+import org.jetbrains.k2js.descriptors.NamePredicate;
 import org.jetbrains.k2js.translate.utils.AnnotationsUtils;
 import org.jetbrains.k2js.translate.utils.BindingUtils;
 
 import java.util.List;
 
 import static org.jetbrains.k2js.translate.intrinsic.functions.basic.FunctionIntrinsic.CallParametersAwareFunctionIntrinsic;
-import static org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern;
+import static org.jetbrains.k2js.descriptors.PatternBuilder.pattern;
 import static org.jetbrains.k2js.translate.utils.ManglingUtils.getStableMangledNameForDescriptor;
 import static org.jetbrains.k2js.descriptors.DescriptorsPackage.getNameIfStandardType;
 

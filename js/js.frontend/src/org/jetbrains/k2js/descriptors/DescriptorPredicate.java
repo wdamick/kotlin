@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jetbrains.k2js.translate.intrinsic.functions.patterns;
+package org.jetbrains.k2js.descriptors;
 
 import com.google.common.base.Predicate;
 import org.jetbrains.annotations.Nullable;

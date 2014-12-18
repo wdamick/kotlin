@@ -29,7 +29,7 @@ import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.k2js.translate.context.TranslationContext;
 import org.jetbrains.k2js.translate.general.AbstractTranslator;
 import org.jetbrains.k2js.translate.general.Translation;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.NamePredicate;
+import org.jetbrains.k2js.descriptors.NamePredicate;
 import org.jetbrains.k2js.translate.utils.BindingUtils;
 import org.jetbrains.k2js.translate.utils.JsAstUtils;
 import org.jetbrains.k2js.translate.utils.TranslationUtils;

@@ -23,7 +23,7 @@ import org.jetbrains.jet.lang.psi.JetBinaryExpression
 import org.jetbrains.jet.lang.types.expressions.OperatorConventions
 import org.jetbrains.jet.lexer.JetToken
 import org.jetbrains.k2js.translate.context.TranslationContext
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern
+import org.jetbrains.k2js.descriptors.PatternBuilder.pattern
 import org.jetbrains.k2js.translate.operation.OperatorTable
 import org.jetbrains.k2js.translate.utils.JsAstUtils
 import org.jetbrains.k2js.translate.utils.JsDescriptorUtils

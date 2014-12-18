@@ -36,8 +36,8 @@ import org.jetbrains.jet.lang.types.lang.InlineStrategy;
 import org.jetbrains.jet.lang.types.lang.InlineUtil;
 import org.jetbrains.k2js.translate.callTranslator.CallTranslator;
 import org.jetbrains.k2js.translate.context.TranslationContext;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.DescriptorPredicate;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder;
+import org.jetbrains.k2js.descriptors.DescriptorPredicate;
+import org.jetbrains.k2js.descriptors.PatternBuilder;
 import org.jetbrains.k2js.resolve.diagnostics.ErrorsJs;
 
 import org.jetbrains.annotations.NotNull;

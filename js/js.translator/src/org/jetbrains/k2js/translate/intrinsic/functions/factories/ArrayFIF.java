@@ -26,13 +26,13 @@ import org.jetbrains.jet.lang.types.lang.PrimitiveType;
 import org.jetbrains.k2js.translate.context.Namer;
 import org.jetbrains.k2js.translate.context.TranslationContext;
 import org.jetbrains.k2js.translate.intrinsic.functions.basic.FunctionIntrinsic;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.DescriptorPredicate;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.NamePredicate;
+import org.jetbrains.k2js.descriptors.DescriptorPredicate;
+import org.jetbrains.k2js.descriptors.NamePredicate;
 
 import java.util.List;
 
 import static com.intellij.openapi.util.text.StringUtil.decapitalize;
-import static org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern;
+import static org.jetbrains.k2js.descriptors.PatternBuilder.pattern;
 import static org.jetbrains.k2js.translate.utils.JsAstUtils.assignment;
 
 public final class ArrayFIF extends CompositeFIF {

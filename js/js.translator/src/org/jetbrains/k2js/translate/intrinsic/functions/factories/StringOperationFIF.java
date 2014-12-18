@@ -19,7 +19,7 @@ package org.jetbrains.k2js.translate.intrinsic.functions.factories;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.k2js.translate.intrinsic.functions.basic.BuiltInFunctionIntrinsic;
 
-import static org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern;
+import static org.jetbrains.k2js.descriptors.PatternBuilder.pattern;
 
 public final class StringOperationFIF extends CompositeFIF {
     @NotNull

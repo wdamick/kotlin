@@ -22,7 +22,7 @@ import org.jetbrains.jet.lang.psi.JetBinaryExpression
 import org.jetbrains.jet.lang.types.expressions.OperatorConventions
 import org.jetbrains.k2js.translate.context.TranslationContext
 import org.jetbrains.k2js.translate.intrinsic.functions.factories.TopLevelFIF
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.NamePredicate
+import org.jetbrains.k2js.descriptors.NamePredicate
 import org.jetbrains.k2js.translate.utils.JsAstUtils
 import org.jetbrains.k2js.translate.utils.JsDescriptorUtils
 import org.jetbrains.k2js.translate.utils.TranslationUtils
@@ -33,7 +33,7 @@ import org.jetbrains.k2js.translate.utils.PsiUtils.getOperationToken
 import org.jetbrains.jet.lexer.JetToken
 import org.jetbrains.jet.lexer.JetTokens
 import com.google.common.collect.ImmutableSet
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern
+import org.jetbrains.k2js.descriptors.PatternBuilder.pattern
 import org.jetbrains.jet.lang.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.jet.lang.types.isDynamic
 

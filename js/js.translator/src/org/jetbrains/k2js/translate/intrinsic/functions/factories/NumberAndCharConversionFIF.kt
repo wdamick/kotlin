@@ -20,7 +20,7 @@ import com.google.common.base.Predicates
 import com.google.dart.compiler.backend.js.ast.JsExpression
 import org.jetbrains.k2js.translate.context.TranslationContext
 import org.jetbrains.k2js.translate.intrinsic.functions.basic.FunctionIntrinsic
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern
+import org.jetbrains.k2js.descriptors.PatternBuilder.pattern
 import org.jetbrains.k2js.translate.utils.ID
 import org.jetbrains.k2js.translate.utils.JsAstUtils.*
 

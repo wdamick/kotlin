@@ -30,15 +30,15 @@ import org.jetbrains.jet.lang.types.expressions.OperatorConventions;
 import org.jetbrains.jet.lexer.JetToken;
 import org.jetbrains.k2js.translate.context.TranslationContext;
 import org.jetbrains.k2js.translate.intrinsic.functions.basic.FunctionIntrinsic;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.DescriptorPredicate;
-import org.jetbrains.k2js.translate.intrinsic.functions.patterns.NamePredicate;
+import org.jetbrains.k2js.descriptors.DescriptorPredicate;
+import org.jetbrains.k2js.descriptors.NamePredicate;
 import org.jetbrains.k2js.translate.operation.OperatorTable;
 import org.jetbrains.k2js.translate.utils.JsAstUtils;
 import org.jetbrains.k2js.translate.utils.JsDescriptorUtils;
 
 import java.util.List;
 
-import static org.jetbrains.k2js.translate.intrinsic.functions.patterns.PatternBuilder.pattern;
+import static org.jetbrains.k2js.descriptors.PatternBuilder.pattern;
 
 public enum PrimitiveBinaryOperationFIF implements FunctionIntrinsicFactory {
     INSTANCE;
