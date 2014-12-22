@@ -30,9 +30,14 @@ import org.jetbrains.k2js.PredefinedAnnotation
 import org.jetbrains.jet.lang.resolve.DescriptorUtils
 import org.jetbrains.k2js.translate.utils.AnnotationsUtils
 import org.jetbrains.jet.lang.descriptors.Visibilities
+import org.jetbrains.jet.lang.resolve.calls.CallChecker
 
-public object KotlinJsDeclarationCheckerProvider : AdditionalCheckerProvider {
-    override val annotationCheckers: List<AnnotationChecker> = listOf(NativeInvokeChecker(), NativeGetterChecker(), NativeSetterChecker())
+public object KotlinJsDeclarationCheckerProvider : AdditionalCheckerProvider() {
+    override val additionalAnnotationCheckers: List<AnnotationChecker> = listOf(
+            NativeInvokeChecker(), NativeGetterChecker(), NativeSetterChecker()
+    )
+
+    override val additionalCallCheckers: List<CallChecker> = listOf()
 }
 
 private abstract class AbstractNativeAnnotationsChecker(private val requiredAnnotation: PredefinedAnnotation) : AnnotationChecker {

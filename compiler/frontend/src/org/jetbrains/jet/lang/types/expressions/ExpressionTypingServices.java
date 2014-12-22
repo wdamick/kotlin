@@ -31,10 +31,7 @@ import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
 import org.jetbrains.jet.lang.evaluate.ConstantExpressionEvaluator;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.*;
-import org.jetbrains.jet.lang.resolve.calls.CallExpressionResolver;
-import org.jetbrains.jet.lang.resolve.calls.CallResolver;
-import org.jetbrains.jet.lang.resolve.calls.CallChecker;
-import org.jetbrains.jet.lang.resolve.calls.CallResolverExtensionProvider;
+import org.jetbrains.jet.lang.resolve.calls.*;
 import org.jetbrains.jet.lang.resolve.calls.context.ContextDependency;
 import org.jetbrains.jet.lang.resolve.calls.context.ResolutionContext;
 import org.jetbrains.jet.lang.resolve.calls.smartcasts.DataFlowInfo;
@@ -67,7 +64,6 @@ public class ExpressionTypingServices {
     private DescriptorResolver descriptorResolver;
     private TypeResolver typeResolver;
     private AnnotationResolver annotationResolver;
-    private CallResolverExtensionProvider extensionProvider;
     private PartialBodyResolveProvider partialBodyResolveProvider;
     private KotlinBuiltIns builtIns;
 
@@ -129,11 +125,6 @@ public class ExpressionTypingServices {
     @Inject
     public void setAnnotationResolver(@NotNull AnnotationResolver annotationResolver) {
         this.annotationResolver = annotationResolver;
-    }
-
-    @Inject
-    public void setExtensionProvider(@NotNull CallResolverExtensionProvider extensionProvider) {
-        this.extensionProvider = extensionProvider;
     }
 
     @NotNull

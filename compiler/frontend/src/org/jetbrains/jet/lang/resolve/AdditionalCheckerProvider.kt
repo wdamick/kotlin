@@ -19,13 +19,40 @@ package org.jetbrains.jet.lang.resolve
 import org.jetbrains.annotations.ReadOnly
 
 import java.util.Collections
+import kotlin.properties.Delegates
+import org.jetbrains.jet.lang.resolve.calls.CallChecker
+import org.jetbrains.jet.lang.resolve.calls.NeedSyntheticCallChecker
+import org.jetbrains.jet.lang.resolve.calls.ReifiedTypeParameterSubstitutionCheck
+import org.jetbrains.jet.lang.resolve.calls.InlineCallCheckerWrapper
 
-public trait AdditionalCheckerProvider {
+public abstract class AdditionalCheckerProvider {
 
-    public val annotationCheckers: List<AnnotationChecker>
+    public val annotationCheckers: List<AnnotationChecker> by Delegates.lazy {
+        with (arrayListOf<AnnotationChecker>()) {
+            addAll(additionalAnnotationCheckers)
+            this
+        }
+    }
 
-    public object Empty : AdditionalCheckerProvider {
+    public val callCheckers: List<CallChecker> by Delegates.lazy {
+        with (arrayListOf<CallChecker>()) {
+            addAll(defaultCallCheckers)
+            addAll(additionalCallCheckers)
+            this
+        }
+    }
 
-        override val annotationCheckers: List<AnnotationChecker> = listOf()
+    protected abstract val additionalAnnotationCheckers: List<AnnotationChecker>
+    protected abstract val additionalCallCheckers: List<CallChecker>
+
+    private val defaultCallCheckers: List<CallChecker> = listOf(
+            ReifiedTypeParameterSubstitutionCheck(),
+            InlineCallCheckerWrapper()
+    )
+
+    public object Empty : AdditionalCheckerProvider() {
+
+        override val additionalAnnotationCheckers: List<AnnotationChecker> = listOf()
+        override val additionalCallCheckers: List<CallChecker> = listOf()
     }
 }
