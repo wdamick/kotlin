@@ -20,15 +20,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.descriptors.CallableDescriptor;
 import org.jetbrains.jet.lang.resolve.calls.context.BasicCallResolutionContext;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCall;
-import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResultsImpl;
 
 import java.util.List;
 
-public class CompositeExtension implements CallResolverExtension {
+public class CompositeExtension implements CallChecker {
 
-    private final List<CallResolverExtension> extensions;
+    private final List<CallChecker> extensions;
 
-    public CompositeExtension(@NotNull List<CallResolverExtension> extensions) {
+    public CompositeExtension(@NotNull List<CallChecker> extensions) {
         this.extensions = extensions;
     }
 
@@ -37,7 +36,7 @@ public class CompositeExtension implements CallResolverExtension {
             @NotNull ResolvedCall<F> resolvedCall,
             @NotNull BasicCallResolutionContext context
     ) {
-        for (CallResolverExtension resolverExtension : extensions) {
+        for (CallChecker resolverExtension : extensions) {
             resolverExtension.run(resolvedCall, context);
         }
     }

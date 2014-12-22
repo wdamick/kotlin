@@ -26,7 +26,7 @@ import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 
 import static org.jetbrains.jet.lang.resolve.BindingContext.NEED_SYNTHETIC_ACCESSOR;
 
-public class NeedSyntheticCallResolverExtension implements CallResolverExtension {
+public class NeedSyntheticCallChecker implements CallChecker {
 
     @Override
     public  <F extends CallableDescriptor> void run(

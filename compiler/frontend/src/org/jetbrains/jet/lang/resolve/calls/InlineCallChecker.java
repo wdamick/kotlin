@@ -46,7 +46,7 @@ import java.util.Set;
 import static org.jetbrains.jet.lang.resolve.InlineDescriptorUtils.allowsNonLocalReturns;
 import static org.jetbrains.jet.lang.resolve.InlineDescriptorUtils.checkNonLocalReturnUsage;
 
-public class InlineCallResolverExtension implements CallResolverExtension {
+public class InlineCallChecker implements CallChecker {
 
     private final SimpleFunctionDescriptor descriptor;
 
@@ -54,8 +54,8 @@ public class InlineCallResolverExtension implements CallResolverExtension {
 
     private final boolean isEffectivelyPublicApiFunction;
 
-    public InlineCallResolverExtension(@NotNull SimpleFunctionDescriptor descriptor) {
-        assert descriptor.getInlineStrategy().isInline() : "This extension should be created only for inline functions but not " + descriptor;
+    public InlineCallChecker(@NotNull SimpleFunctionDescriptor descriptor) {
+        assert descriptor.getInlineStrategy().isInline() : "This checker should be created only for inline functions but not " + descriptor;
         this.descriptor = descriptor;
         this.isEffectivelyPublicApiFunction = isEffectivelyPublicApi(descriptor);
 

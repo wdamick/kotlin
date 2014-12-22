@@ -439,7 +439,7 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
         trace.record(RESOLVED_CALL, call, resolvedCall);
         trace.record(CALL, expression, call);
 
-        context.callResolverExtension.run(resolvedCall,
+        context.callChecker.run(resolvedCall,
                                           BasicCallResolutionContext.create(context, call, CheckValueArgumentsMode.DISABLED));
     }
 

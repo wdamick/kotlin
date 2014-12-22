@@ -30,7 +30,7 @@ import org.jetbrains.jet.lang.types.typeUtil.TypeUtilPackage;
 
 import java.util.Map;
 
-public class ReifiedTypeParameterSubstitutionCheck implements CallResolverExtension {
+public class ReifiedTypeParameterSubstitutionCheck implements CallChecker {
     @Override
     public <F extends CallableDescriptor> void run(
             @NotNull ResolvedCall<F> resolvedCall, @NotNull BasicCallResolutionContext context
