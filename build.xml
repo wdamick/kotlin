@@ -759,7 +759,7 @@
     </target>
 
     <target name="pack-runtime-sources">
-        <jar destfile="${kotlin-home}/lib/kotlin-runtime-sources.jar">
+        <jar destfile="${kotlin-home}/lib/kotlin-runtime-sources.jar" duplicate="fail">
             <fileset dir="${basedir}/core/builtins/native" includes="**/*"/>
             <fileset dir="${basedir}/core/builtins/src" includes="**/*"/>
             <fileset dir="${basedir}/core/runtime.jvm/src" includes="**/*"/>
