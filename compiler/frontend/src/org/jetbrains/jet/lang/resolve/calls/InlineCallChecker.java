@@ -46,7 +46,7 @@ import java.util.Set;
 import static org.jetbrains.jet.lang.resolve.InlineDescriptorUtils.allowsNonLocalReturns;
 import static org.jetbrains.jet.lang.resolve.InlineDescriptorUtils.checkNonLocalReturnUsage;
 
-public class InlineCallChecker implements CallChecker {
+class InlineCallChecker implements CallChecker {
 
     private final SimpleFunctionDescriptor descriptor;
 

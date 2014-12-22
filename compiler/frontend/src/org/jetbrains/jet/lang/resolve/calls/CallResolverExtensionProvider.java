@@ -25,59 +25,7 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class CallResolverExtensionProvider {
-
-    private final static CompositeExtension DEFAULT =
-            new CompositeExtension(Arrays.asList(new NeedSyntheticCallResolverExtension(), new ReifiedTypeParameterSubstitutionCheck()));
-
-    private WeakReference<Map<DeclarationDescriptor, List<CallResolverExtension>>> extensionsCache;
-
     @NotNull
     public CallResolverExtension createExtension(@Nullable DeclarationDescriptor descriptor, boolean isAnnotationContext) {
-        if (descriptor == null || isAnnotationContext) {
-            return DEFAULT;
-        }
-        return new CompositeExtension(createExtensions(descriptor));
-    }
-
-    // create extension list with default one at the end
-    @NotNull
-    private List<CallResolverExtension> createExtensions(@NotNull DeclarationDescriptor declaration) {
-        Map<DeclarationDescriptor, List<CallResolverExtension>> map;
-        if (extensionsCache == null || (map = extensionsCache.get()) == null) {
-            map = new HashMap<DeclarationDescriptor, List<CallResolverExtension>>();
-            extensionsCache = new WeakReference<Map<DeclarationDescriptor, List<CallResolverExtension>>>(map);
-        }
-
-        List<CallResolverExtension> extensions = map.get(declaration);
-        if (extensions != null) {
-            return extensions;
-        }
-
-        extensions = new ArrayList<CallResolverExtension>();
-
-        DeclarationDescriptor parent = declaration.getContainingDeclaration();
-        if (parent != null) {
-            extensions.addAll(createExtensions(parent));
-            extensions.remove(extensions.size() - 1);//remove default from parent list
-        }
-
-        appendExtensionsFor(declaration, extensions);
-
-        List<CallResolverExtension> immutableResult = Collections.unmodifiableList(extensions);
-        map.put(declaration, immutableResult);
-
-        return immutableResult;
-    }
-
-    // with default one at the end
-    private static void appendExtensionsFor(DeclarationDescriptor declarationDescriptor, List<CallResolverExtension> extensions) {
-        if (declarationDescriptor instanceof SimpleFunctionDescriptor) {
-            SimpleFunctionDescriptor descriptor = (SimpleFunctionDescriptor) declarationDescriptor;
-            if (descriptor.getInlineStrategy().isInline()) {
-                extensions.add(new InlineCallResolverExtension(descriptor));
-            }
-        }
-        // add your extensions here
-        extensions.add(DEFAULT);
     }
 }
