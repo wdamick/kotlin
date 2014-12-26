@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.PackageIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.PsiElementFinderImpl;
 import com.intellij.psi.impl.file.PsiPackageImpl;
 import com.intellij.psi.impl.file.impl.JavaFileManager;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -68,14 +69,7 @@ public class KotlinJavaPsiFacade {
                     super.calcFinders(), new Function1<PsiElementFinder, Boolean>() {
                 @Override
                 public Boolean invoke(PsiElementFinder finder) {
-                    if (finder instanceof KotlinFinderMarker) return false;
-
-                    if (finder.getClass().getName().equals("org.jetbrains.jet.lang.resolve.java.JavaPsiFacadeImpl$PsiElementFinderImpl")) {
-                        // TODO: Replace with instanceof check in idea 14
-                        return false;
-                    }
-
-                    return true;
+                    return !(finder instanceof KotlinFinderMarker || finder instanceof PsiElementFinderImpl);
                 }
             });
 
