@@ -19,6 +19,10 @@ package kotlin.reflect.jvm.internal
 import kotlin.reflect.*
 import kotlin.jvm.internal.KotlinClass
 import kotlin.jvm.internal.KotlinSyntheticClass
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.resolve.descriptorUtil.resolveTopLevelClass
+import org.jetbrains.kotlin.load.java.structure.reflect.fqName
+import org.jetbrains.kotlin.name.Name
 
 enum class KClassOrigin {
     BUILT_IN
@@ -30,6 +34,23 @@ private val KOTLIN_CLASS_ANNOTATION_CLASS = javaClass<KotlinClass>()
 private val KOTLIN_SYNTHETIC_CLASS_ANNOTATION_CLASS = javaClass<KotlinSyntheticClass>()
 
 class KClassImpl<T>(val jClass: Class<T>, isKnownToBeKotlin: Boolean = false) : KClass<T> {
+    // Don't use kotlin.properties.Delegates here because it's a Kotlin class which will invoke KClassImpl() in <clinit>,
+    // resulting in infinite recursion
+    val descriptor: ClassDescriptor by Delegates.lazySoft {
+        val module = jClass.getModule()
+        val outerClass = jClass.getDeclaringClass() as Class<Any>?
+        val descriptor = if (outerClass == null) {
+            module.resolveTopLevelClass(jClass.fqName)
+        }
+        else {
+            // TODO: don't create new KClassImpl here, get $kotlinClass or go to foreignKClasses
+            val name = Name.identifier(jClass.getSimpleName())
+            KClassImpl(outerClass).descriptor.getUnsubstitutedInnerClassesScope().getClassifier(name) as ClassDescriptor?
+        }
+        // TODO: do something if class is not found
+        descriptor!!
+    }
+
     // TODO: write metadata to local classes
     private val origin: KClassOrigin =
             if (isKnownToBeKotlin ||

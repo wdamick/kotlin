@@ -48,7 +48,7 @@ fun findAnnotation(annotations: Array<Annotation>, fqName: FqName): ReflectJavaA
 }
 
 // TODO: can there be primitive types, arrays? Anonymous classes which don't have a FqName?
-private val Class<*>.fqName: FqName
+public val Class<*>.fqName: FqName
     get() = getDeclaringClass()?.fqName?.child(Name.identifier(getSimpleName())) ?: FqName(getName())
 
 val Class<*>.classId: ClassId
