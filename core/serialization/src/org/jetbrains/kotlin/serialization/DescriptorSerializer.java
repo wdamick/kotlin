@@ -130,23 +130,22 @@ public class DescriptorSerializer {
             }
         }
 
+        //TODO_R: write only name
         ClassDescriptor classObject = classDescriptor.getClassObjectDescriptor();
         if (classObject != null) {
-            builder.setClassObject(classObjectProto(classObject));
+            if (isClassObject(classObject)) {
+                ProtoBuf.Class.ClassObject.Builder classObjectBuilder = ProtoBuf.Class.ClassObject.newBuilder();
+                classObjectBuilder.setClassObjectName(stringTable.getSimpleNameIndex(classObject.getName()));
+                builder.setClassObject(classObjectBuilder);
+            }
+            else {
+                builder.setClassObject(ProtoBuf.Class.ClassObject.getDefaultInstance());
+            }
         }
 
         extension.serializeClass(classDescriptor, builder, stringTable);
 
         return builder;
-    }
-
-    @NotNull
-    private ProtoBuf.Class.ClassObject classObjectProto(@NotNull ClassDescriptor classObject) {
-        if (isObject(classObject.getContainingDeclaration())) {
-            return ProtoBuf.Class.ClassObject.newBuilder().setData(classProto(classObject)).build();
-        }
-
-        return ProtoBuf.Class.ClassObject.getDefaultInstance();
     }
 
     @NotNull

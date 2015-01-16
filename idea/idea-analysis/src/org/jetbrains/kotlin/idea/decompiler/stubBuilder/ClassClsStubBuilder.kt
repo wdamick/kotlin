@@ -31,7 +31,6 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.JetDelegationSpecifierList
 import org.jetbrains.kotlin.psi.JetDelegatorToSuperClass
 import org.jetbrains.kotlin.lexer.JetTokens
-import org.jetbrains.kotlin.name.SpecialNames.getClassObjectName
 import org.jetbrains.kotlin.psi.JetClassObject
 import org.jetbrains.kotlin.serialization.deserialization.ProtoContainer
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinModifierListStubImpl
@@ -112,8 +111,8 @@ private class ClassClsStubBuilder(
 
     private fun doCreateClassOrObjectStub(parent: StubElement<out PsiElement>): StubElement<out PsiElement> {
         val isClassObject = classKind == ProtoBuf.Class.Kind.CLASS_OBJECT
-        val fqName = if (!isClassObject) outerContext.memberFqNameProvider.getMemberFqName(classId.getRelativeClassName().shortName()) else null
-        val shortName = fqName?.shortName()?.ref()
+        val fqName = outerContext.memberFqNameProvider.getMemberFqName(classId.getRelativeClassName().shortName())
+        val shortName = fqName.shortName()?.ref()
         val superTypeRefs = supertypeIds.filter {
             //TODO: filtering function types should go away
             !KotlinBuiltIns.isExactFunctionType(it.asSingleFqName()) && !KotlinBuiltIns.isExactExtensionFunctionType(it.asSingleFqName())
@@ -132,7 +131,7 @@ private class ClassClsStubBuilder(
                 KotlinClassStubImpl(
                         JetClassElementType.getStubType(classKind == ProtoBuf.Class.Kind.ENUM_ENTRY),
                         parent,
-                        fqName?.ref(),
+                        fqName.ref(),
                         shortName,
                         superTypeRefs,
                         isTrait = classKind == ProtoBuf.Class.Kind.TRAIT,
@@ -181,11 +180,12 @@ private class ClassClsStubBuilder(
     }
 
     private fun createClassObjectStub(classBody: KotlinPlaceHolderStubImpl<JetClassBody>) {
-        if (!classProto.hasClassObject() || classKind == ProtoBuf.Class.Kind.OBJECT) {
+        //TODO_R:
+        if (!classProto.hasClassObject() || classKind == ProtoBuf.Class.Kind.OBJECT || classKind == ProtoBuf.Class.Kind.CLASS_OBJECT) {
             return
         }
 
-        val classObjectId = classId.createNestedClassId(getClassObjectName(classId.getRelativeClassName().shortName()))
+        val classObjectId = classId.createNestedClassId(c.nameResolver.getName(classProto.getClassObject().getClassObjectName()))
         createNestedClassStub(classBody, classObjectId)
     }
 
