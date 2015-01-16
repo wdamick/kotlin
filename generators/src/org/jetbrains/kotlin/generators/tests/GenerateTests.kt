@@ -451,6 +451,7 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractJetInspectionTest>()) {
             model("intentions", pattern = "^(inspections\\.test)$", singleClass = true)
+            model("inspections", pattern = "^(inspections\\.test)$", singleClass = true)
         }
 
         testClass(javaClass<AbstractHierarchyTest>()) {
@@ -661,7 +662,8 @@ fun main(args: Array<String>) {
         }
 
         testClass(javaClass<AbstractSelectExpressionForDebuggerTest>()) {
-            model("debugger/selectExpression")
+            model("debugger/selectExpression", recursive = false)
+            model("debugger/selectExpression/disallowMethodCalls", testMethod = "doTestWoMethodCalls")
         }
 
         testClass(javaClass<AbstractKotlinCoverageOutputFilesTest>()) {

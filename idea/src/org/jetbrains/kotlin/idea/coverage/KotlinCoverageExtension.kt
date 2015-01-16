@@ -24,15 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.coverage.CoverageSuitesBundle
 import java.io.File
 import org.jetbrains.kotlin.psi.JetFile
-import org.jetbrains.kotlin.idea.debugger.JetPositionManager
-import org.jetbrains.kotlin.idea.caches.resolve.getModuleInfo
-import org.jetbrains.kotlin.psi.JetDeclaration
 import com.intellij.openapi.roots.ProjectRootManager
-import org.jetbrains.kotlin.psi.JetTreeVisitorVoid
-import com.intellij.openapi.application.ApplicationManager
-import org.jetbrains.kotlin.psi.JetFunctionLiteralExpression
-import com.intellij.psi.PsiElement
-import java.util.LinkedHashSet
 import com.intellij.psi.PsiClass
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiNamedElement
@@ -49,6 +41,7 @@ import org.jetbrains.kotlin.load.kotlin.KotlinBinaryClassCache
 import com.intellij.openapi.vfs.LocalFileSystem
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
 import com.intellij.openapi.util.io.FileUtilRt
+import org.jetbrains.kotlin.idea.util.application.runReadAction
 
 public class KotlinCoverageExtension(): JavaCoverageEngineExtension() {
     private val LOG = Logger.getInstance(javaClass<KotlinCoverageExtension>())
@@ -57,8 +50,11 @@ public class KotlinCoverageExtension(): JavaCoverageEngineExtension() {
 
     override fun suggestQualifiedName(sourceFile: PsiFile, classes: Array<out PsiClass>, names: MutableSet<String>): Boolean {
         if (sourceFile is JetFile) {
-            names.addAll(collectOutputClassNames(sourceFile).map { StringUtil.replaceChar(it, '/', '.' )})
-            return true
+            val qNames = collectGeneratedClassQualifiedNames(findOutputRoot(sourceFile), sourceFile)
+            if (qNames != null) {
+                names.addAll(qNames)
+                return true
+            }
         }
         return false
     }
@@ -71,73 +67,9 @@ public class KotlinCoverageExtension(): JavaCoverageEngineExtension() {
             return null
         }
         LOG.info("Retrieving coverage for " + element.getName())
-        val outputRoot = findOutputRoot(element)
-        val existingClassFiles = getClassesGeneratedFromFile(outputRoot, element)
-        if (existingClassFiles.isEmpty()) {
-            return null
-        }
-        LOG.debug("Classfiles: [${existingClassFiles.map { it.getName() }.join()}]")
-        val qualifiedNames = existingClassFiles.map {
-            val relativePath = VfsUtilCore.getRelativePath(it, outputRoot)
-            StringUtil.trimEnd(relativePath, ".class").replace("/", ".")
-        }
 
-        return totalCoverageForQualifiedNames(coverageAnnotator, qualifiedNames)
-    }
-
-    private fun getClassesGeneratedFromFile(outputRoot: VirtualFile?, file: JetFile): List<VirtualFile> {
-        val relativePath = file.getPackageFqName().asString().replace('.', '/')
-        val packageOutputDir = outputRoot?.findFileByRelativePath(relativePath)
-        if (packageOutputDir == null) return listOf()
-
-        val prefixes = collectClassFilePrefixes(file)
-        LOG.debug("Classfile prefixes: [${prefixes.join(", ")}]")
-        return packageOutputDir.getChildren().filter {
-            file -> prefixes.any {
-                (file.getName().startsWith(it + "$") && FileUtilRt.getExtension(file.getName()) == "class") ||
-                    file.getName() == it + ".class"
-            }
-        }
-    }
-
-    private fun totalCoverageForQualifiedNames(coverageAnnotator: JavaCoverageAnnotator,
-                                               qualifiedNames: List<String>): PackageAnnotator.ClassCoverageInfo {
-        val result = PackageAnnotator.ClassCoverageInfo()
-        result.totalClassCount = 0
-        qualifiedNames.forEach {
-            val classInfo = coverageAnnotator.getClassCoverageInfo(it)
-            if (classInfo != null) {
-                result.totalClassCount += classInfo.totalClassCount
-                result.coveredClassCount += classInfo.coveredClassCount
-                result.totalMethodCount += classInfo.totalMethodCount
-                result.coveredMethodCount += classInfo.coveredMethodCount
-                result.totalLineCount += classInfo.totalLineCount
-                result.fullyCoveredLineCount += classInfo.fullyCoveredLineCount
-                result.partiallyCoveredLineCount += classInfo.partiallyCoveredLineCount
-            }
-            else {
-                LOG.debug("Found no coverage for ${it}")
-            }
-        }
-        return result
-    }
-
-    private fun findOutputRoot(file: JetFile): VirtualFile? {
-        val module = ModuleUtilCore.findModuleForPsiElement(file)
-        if (module == null) return null
-        val fileIndex = ProjectRootManager.getInstance(file.getProject()).getFileIndex()
-        val inTests = fileIndex.isInTestSourceContent(file.getVirtualFile())
-        val compilerOutputExtension = CompilerModuleExtension.getInstance(module)
-        return if (inTests)
-            compilerOutputExtension.getCompilerOutputPathForTests()
-        else
-            compilerOutputExtension.getCompilerOutputPath()
-    }
-
-    private fun collectClassFilePrefixes(file: JetFile): Collection<String> {
-        val result = file.getChildren().filter { it is JetClassOrObject }.map { (it as JetClassOrObject).getName() }
-        val packagePartFqName = PackagePartClassUtils.getPackagePartFqName(file)
-        return result.union(arrayListOf(packagePartFqName.shortName().asString()))
+        val qualifiedNames = collectGeneratedClassQualifiedNames(findOutputRoot(element), element)
+        return if (qualifiedNames == null) null else totalCoverageForQualifiedNames(coverageAnnotator, qualifiedNames)
     }
 
     // Implements API added in IDEA 14.1
@@ -175,47 +107,84 @@ public class KotlinCoverageExtension(): JavaCoverageEngineExtension() {
                 return false
             }
 
-            val classNames = ApplicationManager.getApplication().runReadAction<Set<String>> { collectOutputClassNames(srcFile) }
-
-            fun findUnder(name: String, root: VirtualFile?): File? {
-                if (root != null) {
-                    val outputFile = File(root.getPath(), name + ".class")
-                    if (outputFile.exists()) {
-                        return outputFile
-                    }
-                }
-                return null
+            runReadAction {
+                val outputRoot = findOutputRoot(srcFile)
+                val existingClassFiles = getClassesGeneratedFromFile(outputRoot, srcFile)
+                existingClassFiles.mapTo(classFiles) { File(it.getPath()) }
             }
-
-            classNames.map { findUnder(it, output) ?: findUnder(it, testoutput) }.filterNotNullTo(classFiles)
             return true
         }
         return false
     }
 
     class object {
-        public fun collectOutputClassNames(srcFile: JetFile): Set<String> {
-            val typeMapper = JetPositionManager.createTypeMapper(srcFile, srcFile.getModuleInfo())
-            val classNames = LinkedHashSet<String>()
-            srcFile.acceptChildren(object: JetTreeVisitorVoid() {
-                override fun visitDeclaration(dcl: JetDeclaration) {
-                    super.visitDeclaration(dcl)
-                    collectClassName(dcl.getFirstChild())
-                }
+        private val LOG = Logger.getInstance(javaClass<KotlinCoverageExtension>())
 
-                override fun visitFunctionLiteralExpression(expression: JetFunctionLiteralExpression) {
-                    super.visitFunctionLiteralExpression(expression)
-                    collectClassName(expression.getFunctionLiteral().getFirstChild())
-                }
+        fun collectGeneratedClassQualifiedNames(outputRoot: VirtualFile?, file: JetFile): List<String>? {
+            val existingClassFiles = getClassesGeneratedFromFile(outputRoot, file)
+            if (existingClassFiles.isEmpty()) {
+                return null
+            }
+            LOG.debug("Classfiles: [${existingClassFiles.map { it.getName() }.join()}]")
+            return existingClassFiles.map {
+                val relativePath = VfsUtilCore.getRelativePath(it, outputRoot)
+                StringUtil.trimEnd(relativePath, ".class").replace("/", ".")
+            }
+        }
 
-                private fun collectClassName(element: PsiElement) {
-                    val className = JetPositionManager.getClassNameForElement(element, typeMapper, srcFile, false)
-                    if (className != null) {
-                        classNames.add(className)
-                    }
+        private fun totalCoverageForQualifiedNames(coverageAnnotator: JavaCoverageAnnotator,
+                                                   qualifiedNames: List<String>): PackageAnnotator.ClassCoverageInfo {
+            val result = PackageAnnotator.ClassCoverageInfo()
+            result.totalClassCount = 0
+            qualifiedNames.forEach {
+                val classInfo = coverageAnnotator.getClassCoverageInfo(it)
+                if (classInfo != null) {
+                    result.totalClassCount += classInfo.totalClassCount
+                    result.coveredClassCount += classInfo.coveredClassCount
+                    result.totalMethodCount += classInfo.totalMethodCount
+                    result.coveredMethodCount += classInfo.coveredMethodCount
+                    result.totalLineCount += classInfo.totalLineCount
+                    result.fullyCoveredLineCount += classInfo.fullyCoveredLineCount
+                    result.partiallyCoveredLineCount += classInfo.partiallyCoveredLineCount
                 }
-            })
-            return classNames
+                else {
+                    LOG.debug("Found no coverage for ${it}")
+                }
+            }
+            return result
+        }
+
+        private fun getClassesGeneratedFromFile(outputRoot: VirtualFile?, file: JetFile): List<VirtualFile> {
+            val relativePath = file.getPackageFqName().asString().replace('.', '/')
+            val packageOutputDir = outputRoot?.findFileByRelativePath(relativePath)
+            if (packageOutputDir == null) return listOf()
+
+            val prefixes = collectClassFilePrefixes(file)
+            LOG.debug("Classfile prefixes: [${prefixes.join(", ")}]")
+            return packageOutputDir.getChildren().filter {
+                file -> prefixes.any {
+                (file.getName().startsWith(it + "$") && FileUtilRt.getExtension(file.getName()) == "class") ||
+                file.getName() == it + ".class"
+            }
+            }
+        }
+
+        private fun findOutputRoot(file: JetFile): VirtualFile? {
+            val module = ModuleUtilCore.findModuleForPsiElement(file)
+            if (module == null) return null
+            val fileIndex = ProjectRootManager.getInstance(file.getProject()).getFileIndex()
+            val inTests = fileIndex.isInTestSourceContent(file.getVirtualFile())
+            val compilerOutputExtension = CompilerModuleExtension.getInstance(module)
+            return if (inTests)
+                compilerOutputExtension.getCompilerOutputPathForTests()
+            else
+                compilerOutputExtension.getCompilerOutputPath()
+        }
+
+        private fun collectClassFilePrefixes(file: JetFile): Collection<String> {
+            val result = file.getChildren().filter { it is JetClassOrObject }.map { (it as JetClassOrObject).getName() }
+            val packagePartFqName = PackagePartClassUtils.getPackagePartFqName(file)
+            return result.union(arrayListOf(packagePartFqName.shortName().asString()))
         }
     }
 }
