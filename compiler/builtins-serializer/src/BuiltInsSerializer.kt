@@ -18,29 +18,29 @@ package org.jetbrains.kotlin.serialization.builtins
 
 import java.io.File
 import com.intellij.openapi.util.Disposer
-import org.jetbrains.jet.config.CompilerConfiguration
-import org.jetbrains.jet.cli.jvm.compiler.JetCoreEnvironment
-import org.jetbrains.jet.descriptors.serialization.*
-import org.jetbrains.jet.lang.descriptors.*
-import org.jetbrains.jet.lang.resolve.name.Name
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.cli.jvm.compiler.JetCoreEnvironment
+import org.jetbrains.kotlin.serialization.*
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.name.Name
 import java.io.ByteArrayOutputStream
-import org.jetbrains.jet.lang.types.lang.BuiltInsSerializationUtil
+import org.jetbrains.kotlin.builtins.BuiltInsSerializationUtil
 import com.intellij.openapi.Disposable
-import org.jetbrains.jet.cli.common.CLIConfigurationKeys
-import org.jetbrains.jet.config.CommonConfigurationKeys
-import org.jetbrains.jet.cli.common.messages.MessageCollector
-import org.jetbrains.jet.lang.resolve.name.FqName
-import org.jetbrains.jet.utils.recursePostOrder
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.config.CommonConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.utils.recursePostOrder
 import com.intellij.psi.search.GlobalSearchScope
-import org.jetbrains.jet.lang.resolve.java.JvmAnalyzerFacade
-import org.jetbrains.jet.context.GlobalContext
-import org.jetbrains.jet.analyzer.ModuleInfo
-import org.jetbrains.jet.lang.resolve.java.JvmPlatformParameters
-import org.jetbrains.jet.analyzer.ModuleContent
-import org.jetbrains.jet.lang.resolve.kotlin.DeserializedResolverUtils
-import org.jetbrains.jet.lang.resolve.scopes.DescriptorKindFilter
-import org.jetbrains.jet.cli.jvm.compiler.EnvironmentConfigFiles
-import org.jetbrains.jet.cli.jvm.JVMConfigurationKeys
+import org.jetbrains.kotlin.resolve.jvm.JvmAnalyzerFacade
+import org.jetbrains.kotlin.context.GlobalContext
+import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.resolve.jvm.JvmPlatformParameters
+import org.jetbrains.kotlin.analyzer.ModuleContent
+import org.jetbrains.kotlin.load.kotlin.DeserializedResolverUtils
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
+import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
+import org.jetbrains.kotlin.cli.jvm.JVMConfigurationKeys
 
 private object BuiltInsSerializerExtension : SerializerExtension() {
     override fun serializeClass(descriptor: ClassDescriptor, proto: ProtoBuf.Class.Builder, stringTable: StringTable) {

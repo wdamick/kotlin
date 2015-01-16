@@ -23,14 +23,14 @@ import com.intellij.psi.PsiFile
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.coverage.CoverageSuitesBundle
 import java.io.File
-import org.jetbrains.jet.lang.psi.JetFile
+import org.jetbrains.kotlin.psi.JetFile
 import org.jetbrains.jet.plugin.debugger.JetPositionManager
 import org.jetbrains.jet.plugin.caches.resolve.getModuleInfo
-import org.jetbrains.jet.lang.psi.JetDeclaration
+import org.jetbrains.kotlin.psi.JetDeclaration
 import com.intellij.openapi.roots.ProjectRootManager
-import org.jetbrains.jet.lang.psi.JetTreeVisitorVoid
+import org.jetbrains.kotlin.psi.JetTreeVisitorVoid
 import com.intellij.openapi.application.ApplicationManager
-import org.jetbrains.jet.lang.psi.JetFunctionLiteralExpression
+import org.jetbrains.kotlin.psi.JetFunctionLiteralExpression
 import com.intellij.psi.PsiElement
 import java.util.LinkedHashSet
 import com.intellij.psi.PsiClass
@@ -40,14 +40,14 @@ import com.intellij.coverage.PackageAnnotator
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.CompilerModuleExtension
 import com.intellij.coverage.JavaCoverageAnnotator
-import org.jetbrains.jet.lang.psi.JetClassOrObject
-import org.jetbrains.jet.lang.resolve.kotlin.PackagePartClassUtils
+import org.jetbrains.kotlin.psi.JetClassOrObject
+import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.diagnostic.Logger
-import org.jetbrains.jet.lang.resolve.java.PackageClassUtils
-import org.jetbrains.jet.lang.resolve.kotlin.KotlinBinaryClassCache
+import org.jetbrains.kotlin.load.kotlin.PackageClassUtils
+import org.jetbrains.kotlin.load.kotlin.KotlinBinaryClassCache
 import com.intellij.openapi.vfs.LocalFileSystem
-import org.jetbrains.jet.lang.resolve.kotlin.header.KotlinClassHeader
+import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
 import com.intellij.openapi.util.io.FileUtilRt
 
 public class KotlinCoverageExtension(): JavaCoverageEngineExtension() {

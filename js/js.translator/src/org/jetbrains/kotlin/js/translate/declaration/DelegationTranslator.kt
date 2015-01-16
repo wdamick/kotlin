@@ -18,8 +18,8 @@ package org.jetbrains.kotlin.js.translate.declaration
 
 
 import com.google.dart.compiler.backend.js.ast.*
-import org.jetbrains.jet.lang.descriptors.*
-import org.jetbrains.jet.lang.psi.*
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.js.translate.context.Namer
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.general.AbstractTranslator
@@ -27,14 +27,13 @@ import org.jetbrains.kotlin.js.translate.general.Translation
 import org.jetbrains.kotlin.js.translate.utils.BindingUtils
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils.*
-
-import org.jetbrains.jet.lang.resolve.DescriptorUtils
-import org.jetbrains.jet.backend.common.CodegenUtil
+import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.backend.common.CodegenUtil
 import java.util.HashMap
 import org.jetbrains.kotlin.js.translate.declaration.propertyTranslator.addGetterAndSetter
 import org.jetbrains.kotlin.js.translate.utils.ManglingUtils.getMangledMemberNameForExplicitDelegation
 import org.jetbrains.kotlin.js.translate.utils.generateDelegateCall
-import org.jetbrains.jet.backend.common.CodegenUtilKt
+import org.jetbrains.kotlin.backend.common.CodegenUtilKt
 
 public class DelegationTranslator(
         private val classDeclaration: JetClassOrObject,

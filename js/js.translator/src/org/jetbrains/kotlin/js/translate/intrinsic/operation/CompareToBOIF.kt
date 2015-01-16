@@ -18,18 +18,17 @@ package org.jetbrains.kotlin.js.translate.intrinsic.operation
 
 import com.google.common.collect.ImmutableSet
 import com.google.dart.compiler.backend.js.ast.*
-import org.jetbrains.jet.lang.descriptors.FunctionDescriptor
-import org.jetbrains.jet.lang.psi.JetBinaryExpression
-import org.jetbrains.jet.lang.types.expressions.OperatorConventions
-import org.jetbrains.jet.lexer.JetToken
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.psi.JetBinaryExpression
+import org.jetbrains.kotlin.types.expressions.OperatorConventions
+import org.jetbrains.kotlin.lexer.JetToken
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.intrinsic.functions.patterns.PatternBuilder.pattern
 import org.jetbrains.kotlin.js.translate.operation.OperatorTable
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
 import org.jetbrains.kotlin.js.translate.utils.JsDescriptorUtils
 import org.jetbrains.kotlin.js.translate.utils.PsiUtils.getOperationToken
-import org.jetbrains.jet.lang.resolve.calls.tasks.isDynamic
-
+import org.jetbrains.kotlin.resolve.calls.tasks.isDynamic
 
 object CompareToBOIF : BinaryOperationIntrinsicFactory {
     val COMPARE_TO_CHAR = pattern("Int|Short|Byte|Double|Float.compareTo(Char)")

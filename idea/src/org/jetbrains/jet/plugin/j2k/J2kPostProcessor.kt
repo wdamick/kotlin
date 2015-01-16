@@ -17,8 +17,8 @@
 package org.jetbrains.jet.plugin.j2k
 
 import org.jetbrains.kotlin.j2k.PostProcessor
-import org.jetbrains.jet.lang.psi.*
-import org.jetbrains.jet.lang.resolve.BindingContext
+import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.jet.plugin.intentions.RemoveExplicitTypeArguments
 import org.jetbrains.jet.plugin.caches.resolve.analyzeFullyAndGetResult
 import java.util.ArrayList

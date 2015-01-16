@@ -36,8 +36,8 @@ import java.io.IOException
 import com.intellij.openapi.ui.ex.MessagesEx
 import org.jetbrains.jet.plugin.j2k.J2kPostProcessor
 import com.intellij.openapi.vfs.CharsetToolkit
-import org.jetbrains.jet.lang.psi.JetFile
-import org.jetbrains.jet.utils.addIfNotNull
+import org.jetbrains.kotlin.psi.JetFile
+import org.jetbrains.kotlin.utils.addIfNotNull
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import org.jetbrains.jet.plugin.j2k.IdeaResolverForConverter

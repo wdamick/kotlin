@@ -23,11 +23,11 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.util.Computable
-import org.jetbrains.jet.lang.diagnostics.Severity
-import org.jetbrains.jet.lang.diagnostics.rendering.DefaultErrorMessages
-import org.jetbrains.jet.lang.psi.JetFile
+import org.jetbrains.kotlin.diagnostics.Severity
+import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
+import org.jetbrains.kotlin.psi.JetFile
 import org.jetbrains.jet.plugin.caches.resolve.analyzeFullyAndGetResult
-import org.jetbrains.jet.JetTestCaseBuilder
+import org.jetbrains.kotlin.test.JetTestCaseBuilder
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 
 public abstract class AbstractJavaToKotlinConverterTest : LightCodeInsightFixtureTestCase() {

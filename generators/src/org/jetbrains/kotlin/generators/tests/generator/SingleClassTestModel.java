@@ -23,8 +23,8 @@ import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jet.JetTestUtils;
-import org.jetbrains.jet.utils.Printer;
+import org.jetbrains.kotlin.test.JetTestUtils;
+import org.jetbrains.kotlin.utils.Printer;
 
 import java.io.File;
 import java.util.Collection;
