@@ -44,6 +44,24 @@ import static org.jetbrains.kotlin.diagnostics.Errors.MANY_CLASS_OBJECTS;
 import static org.jetbrains.kotlin.diagnostics.Errors.UNSUPPORTED;
 
 public class LazyTopDownAnalyzer {
+
+    public static class LazyClassDescriptorProvider {
+        private KotlinCodeAnalyzer resolveSession;
+
+        public LazyClassDescriptorProvider() {
+        }
+
+        @Inject
+        public void setResolveSession(@NotNull KotlinCodeAnalyzer resolveSession) {
+            this.resolveSession = resolveSession;
+        }
+
+        @NotNull
+        public ClassDescriptorWithResolutionScopes getClassDescriptor(@NotNull JetClassOrObject classOrObject) {
+            return (ClassDescriptorWithResolutionScopes) resolveSession.getClassDescriptor(classOrObject);
+        }
+    }
+
     private BindingTrace trace;
 
     private DeclarationResolver declarationResolver;
@@ -57,6 +75,8 @@ public class LazyTopDownAnalyzer {
     private ModuleDescriptor moduleDescriptor;
 
     private KotlinCodeAnalyzer resolveSession;
+
+    private LazyClassDescriptorProvider lazyClassDescriptorProvider;
 
     private BodyResolver bodyResolver;
 
@@ -105,6 +125,11 @@ public class LazyTopDownAnalyzer {
     @Inject
     public void setTopDownAnalyzer(@NotNull TopDownAnalyzer topDownAnalyzer) {
         this.topDownAnalyzer = topDownAnalyzer;
+    }
+
+    @Inject
+    public void setLazyClassDescriptorProvider(@NotNull LazyClassDescriptorProvider lazyClassDescriptorProvider) {
+        this.lazyClassDescriptorProvider = lazyClassDescriptorProvider;
     }
 
     @NotNull
@@ -199,7 +224,7 @@ public class LazyTopDownAnalyzer {
 
                         private void visitClassOrObject(@NotNull JetClassOrObject classOrObject) {
                             ClassDescriptorWithResolutionScopes descriptor =
-                                    (ClassDescriptorWithResolutionScopes) resolveSession.getClassDescriptor(classOrObject);
+                                    (ClassDescriptorWithResolutionScopes) lazyClassDescriptorProvider.getClassDescriptor(classOrObject);
 
                             c.getDeclaredClasses().put(classOrObject, descriptor);
                             registerDeclarations(classOrObject.getDeclarations());

@@ -57,6 +57,7 @@ import org.jetbrains.kotlin.resolve.ScriptBodyResolver;
 import org.jetbrains.kotlin.resolve.DeclarationResolver;
 import org.jetbrains.kotlin.resolve.ImportsResolver;
 import org.jetbrains.kotlin.psi.JetImportsFactory;
+import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer.LazyClassDescriptorProvider;
 import org.jetbrains.kotlin.resolve.OverloadResolver;
 import org.jetbrains.kotlin.resolve.OverrideResolver;
 import org.jetbrains.kotlin.resolve.TopDownAnalyzer;
@@ -112,6 +113,7 @@ public class InjectorForLazyBodyResolve {
     private final DeclarationResolver declarationResolver;
     private final ImportsResolver importsResolver;
     private final JetImportsFactory jetImportsFactory;
+    private final LazyClassDescriptorProvider lazyClassDescriptorProvider;
     private final OverloadResolver overloadResolver;
     private final OverrideResolver overrideResolver;
     private final TopDownAnalyzer topDownAnalyzer;
@@ -169,6 +171,7 @@ public class InjectorForLazyBodyResolve {
         this.declarationResolver = new DeclarationResolver();
         this.importsResolver = new ImportsResolver();
         this.jetImportsFactory = new JetImportsFactory();
+        this.lazyClassDescriptorProvider = new LazyClassDescriptorProvider();
         this.overloadResolver = new OverloadResolver();
         this.overrideResolver = new OverrideResolver();
         this.topDownAnalyzer = new TopDownAnalyzer();
@@ -180,6 +183,7 @@ public class InjectorForLazyBodyResolve {
         this.lazyTopDownAnalyzer.setBodyResolver(bodyResolver);
         this.lazyTopDownAnalyzer.setDeclarationResolver(declarationResolver);
         this.lazyTopDownAnalyzer.setKotlinCodeAnalyzer(analyzer);
+        this.lazyTopDownAnalyzer.setLazyClassDescriptorProvider(lazyClassDescriptorProvider);
         this.lazyTopDownAnalyzer.setModuleDescriptor(moduleDescriptor);
         this.lazyTopDownAnalyzer.setOverloadResolver(overloadResolver);
         this.lazyTopDownAnalyzer.setOverrideResolver(overrideResolver);
@@ -275,6 +279,8 @@ public class InjectorForLazyBodyResolve {
         importsResolver.setTrace(bindingTrace);
 
         jetImportsFactory.setProject(project);
+
+        lazyClassDescriptorProvider.setResolveSession(analyzer);
 
         overloadResolver.setTrace(bindingTrace);
 
