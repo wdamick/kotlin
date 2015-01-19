@@ -48,6 +48,19 @@ public class ScopeProvider implements DeclarationScopeProvider {
         }
     }
 
+    private final static Function1<PsiElement, JetScope> LOCAL_DECLARATIONS_NOT_SUPPORTED = new Function1<PsiElement, JetScope>() {
+        @Override
+        public JetScope invoke(PsiElement jetDeclaration) {
+            throw new IllegalStateException("Don't call this method for local declarations: " + jetDeclaration + "\n" +
+                                            JetPsiUtil.getElementTextWithContext(jetDeclaration));
+        }
+
+        @Override
+        public String toString() {
+            return "LOCAL_DECLARATIONS_NOT_SUPPORTED";
+        }
+    };
+
     private final ResolveSession resolveSession;
 
     private final MemoizedFunctionToNotNull<JetFile, LazyImportScope> explicitImportScopes;
@@ -161,6 +174,11 @@ public class ScopeProvider implements DeclarationScopeProvider {
     @Override
     @NotNull
     public JetScope getResolutionScopeForDeclaration(@NotNull PsiElement elementOfDeclaration) {
+        return getResolutionScopeForDeclaration(elementOfDeclaration, LOCAL_DECLARATIONS_NOT_SUPPORTED);
+    }
+
+    @NotNull
+    public JetScope getResolutionScopeForDeclaration(@NotNull PsiElement elementOfDeclaration, @NotNull Function1<PsiElement, JetScope> forLocalDeclarations) {
         JetDeclaration jetDeclaration = JetStubbedPsiUtil.getPsiOrStubParent(elementOfDeclaration, JetDeclaration.class, false);
 
         assert !(elementOfDeclaration instanceof JetDeclaration) || jetDeclaration == elementOfDeclaration :
@@ -196,7 +214,6 @@ public class ScopeProvider implements DeclarationScopeProvider {
             return classObjectDescriptor.getScopeForMemberDeclarationResolution();
         }
 
-        throw new IllegalStateException("Don't call this method for local declarations: " + jetDeclaration + "\n" +
-                                        JetPsiUtil.getElementTextWithContext(jetDeclaration));
+        return forLocalDeclarations.invoke(jetDeclaration);
     }
 }

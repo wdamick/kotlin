@@ -51,6 +51,8 @@ import org.jetbrains.kotlin.resolve.lazy.ScopeProvider
 import org.jetbrains.kotlin.js.resolve.KotlinJsCheckerProvider
 import org.jetbrains.kotlin.types.DynamicTypesAllowed
 import org.jetbrains.kotlin.types.DynamicTypesSettings
+import org.jetbrains.kotlin.types.expressions.LazyLocalClassifierAnalyzer
+import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyClassContext
 
 // NOTE: After making changes, you need to re-generate the injectors.
 //       To do that, you can run main in this file.
@@ -81,6 +83,7 @@ public fun createInjectorGenerators(): List<DependencyInjectorGenerator> =
                 generatorForLazyResolve(),
                 generatorForBodyResolve(),
                 generatorForLazyBodyResolve(),
+                generatorForLazyLocalClassResolve(),
                 generatorForReplWithJava()
         )
 
@@ -113,11 +116,30 @@ private fun generatorForLazyBodyResolve() =
             parameter<Project>()
             parameter<GlobalContext>(useAsContext = true)
             parameter<KotlinCodeAnalyzer>(name = "analyzer")
+            parameter<LazyClassContext>()
             parameter<BindingTrace>()
             parameter<AdditionalCheckerProvider>()
             parameter<DynamicTypesSettings>()
 
             field<ModuleDescriptor>(init = GivenExpression("analyzer.getModuleDescriptor()"), useAsContext = true)
+            field<LazyLocalClassifierAnalyzer>()
+
+            publicField<LazyTopDownAnalyzer>()
+        }
+
+private fun generatorForLazyLocalClassResolve() =
+        generator("compiler/frontend/src", DI_DEFAULT_PACKAGE, "InjectorForLazyLocalClassResolve") {
+            parameter<Project>()
+            parameter<GlobalContext>(useAsContext = true)
+            parameter<KotlinCodeAnalyzer>(name = "analyzer")
+            parameter<LazyClassContext>()
+            parameter<BindingTrace>()
+            parameter<AdditionalCheckerProvider>()
+            parameter<DynamicTypesSettings>()
+            parameter<LazyTopDownAnalyzer.LazyClassDescriptorProvider>()
+
+            field<ModuleDescriptor>(init = GivenExpression("analyzer.getModuleDescriptor()"), useAsContext = true)
+            field<LazyLocalClassifierAnalyzer>()
 
             publicField<LazyTopDownAnalyzer>()
         }
@@ -261,6 +283,7 @@ private fun generatorForLazyResolve() =
             publicField<ResolveSession>()
 
             field<LazyResolveToken>()
+            field<LazyLocalClassifierAnalyzer>()
         }
 
 private fun DependencyInjectorGenerator.commonForResolveSessionBased() {
@@ -269,6 +292,8 @@ private fun DependencyInjectorGenerator.commonForResolveSessionBased() {
     parameter<BindingTrace>()
     parameter<ModuleDescriptorImpl>(name = "module", useAsContext = true)
     parameter<DeclarationProviderFactory>()
+
+    field<LazyLocalClassifierAnalyzer>()
 
     publicField<ResolveSession>()
 }

@@ -36,3 +36,31 @@ public trait LazyClassContext {
     val declarationProviderFactory: DeclarationProviderFactory
     val annotationResolver: AnnotationResolver
 }
+
+public open class DelegatingLazyClassContext(
+        val delegate: LazyClassContext
+) : LazyClassContext {
+    override val scopeProvider: DeclarationScopeProvider
+        get() = delegate.scopeProvider
+
+    override val storageManager: StorageManager
+        get() = delegate.storageManager
+
+    override val trace: BindingTrace
+        get() = delegate.trace
+
+    override val moduleDescriptor: ModuleDescriptor
+        get() = delegate.moduleDescriptor
+
+    override val descriptorResolver: DescriptorResolver
+        get() = delegate.descriptorResolver
+
+    override val typeResolver: TypeResolver
+        get() = delegate.typeResolver
+
+    override val declarationProviderFactory: DeclarationProviderFactory
+        get() = delegate.declarationProviderFactory
+
+    override val annotationResolver: AnnotationResolver
+        get() = delegate.annotationResolver
+}

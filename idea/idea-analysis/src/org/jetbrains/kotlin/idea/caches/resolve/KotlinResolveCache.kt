@@ -250,6 +250,7 @@ private object KotlinResolveDataProvider {
                     project,
                     SimpleGlobalContext(resolveSession.getStorageManager(), resolveSession.getExceptionTracker()),
                     resolveSession,
+                    resolveSession,
                     trace,
                     targetPlatform.getAdditionalCheckerProvider(),
                     targetPlatform.getDynamicTypesSettings()
