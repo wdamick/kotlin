@@ -54,8 +54,6 @@ import kotlin.Function1;
 import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
-import org.jetbrains.kotlin.CompilerModeProvider;
-import org.jetbrains.kotlin.OperationModeProvider;
 import org.jetbrains.kotlin.asJava.JavaElementFinder;
 import org.jetbrains.kotlin.asJava.KotlinLightClassForPackage;
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport;
@@ -225,7 +223,6 @@ public class JetCoreEnvironment {
         applicationEnvironment.registerFileType(JetFileType.INSTANCE, JetParserDefinition.STD_SCRIPT_SUFFIX); // should be renamed to kts
         applicationEnvironment.registerParserDefinition(new JetParserDefinition());
 
-        applicationEnvironment.getApplication().registerService(OperationModeProvider.class, new CompilerModeProvider());
         applicationEnvironment.getApplication().registerService(KotlinBinaryClassCache.class, new KotlinBinaryClassCache());
     }
 
