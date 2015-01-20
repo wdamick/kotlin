@@ -33,6 +33,18 @@ private fun calculateVisibility(modifiers: Int): Visibility {
         else -> JavaVisibilities.PACKAGE_VISIBILITY
     }
 }
+
+fun getAnnotations(annotations: Array<Annotation>): List<ReflectJavaAnnotation> {
+    return annotations.map { ReflectJavaAnnotation(it) }
+}
+
+fun findAnnotation(annotations: Array<Annotation>, fqName: FqName): ReflectJavaAnnotation? {
+    for (annotation in annotations) {
+        if (annotation.annotationType().fqName == fqName) {
+            return ReflectJavaAnnotation(annotation)
+        }
+    }
+    return null
 }
 
 // TODO: can there be primitive types, arrays? Anonymous classes which don't have a FqName?
