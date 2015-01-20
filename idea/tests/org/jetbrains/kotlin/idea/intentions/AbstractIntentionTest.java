@@ -18,7 +18,9 @@ package org.jetbrains.kotlin.idea.intentions;
 
 import com.google.common.collect.Lists;
 import com.intellij.codeInsight.intention.IntentionAction;
+import com.intellij.ide.startup.impl.StartupManagerImpl;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.testFramework.LightCodeInsightTestCase;
@@ -118,6 +120,12 @@ public abstract class AbstractIntentionTest extends LightCodeInsightTestCase {
         catch (IntentionTestException e) {
             assertEquals("Failure message mismatch.", shouldFailString, e.getMessage());
         }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        ((StartupManagerImpl) StartupManager.getInstance(getProject())).runPostStartupActivities();
     }
 
     @NotNull
