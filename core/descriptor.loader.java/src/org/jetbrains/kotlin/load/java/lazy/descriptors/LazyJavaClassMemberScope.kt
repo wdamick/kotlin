@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.load.java.descriptors.JavaConstructorDescriptor
 import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
 import org.jetbrains.kotlin.types.JetType
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
+import org.jetbrains.kotlin.load.java.lazy.resolveAnnotations
 
 public class LazyJavaClassMemberScope(
         c: LazyJavaResolverContext,
@@ -105,7 +106,7 @@ public class LazyJavaClassMemberScope(
         val classDescriptor = getContainingDeclaration()
 
         val constructorDescriptor = JavaConstructorDescriptor.createJavaConstructor(
-                classDescriptor, Annotations.EMPTY, /* isPrimary = */ false, c.sourceElementFactory.source(constructor)
+                classDescriptor, c.resolveAnnotations(constructor), /* isPrimary = */ false, c.sourceElementFactory.source(constructor)
         )
 
         val valueParameters = resolveValueParameters(c, constructorDescriptor, constructor.getValueParameters())
