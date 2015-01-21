@@ -35,6 +35,8 @@ public interface JetStubElementTypes {
             new JetPlaceHolderStubElementType<JetClassObject>("CLASS_OBJECT", JetClassObject.class);
     JetPlaceHolderStubElementType<JetClassInitializer> ANONYMOUS_INITIALIZER =
             new JetPlaceHolderStubElementType<JetClassInitializer>("ANONYMOUS_INITIALIZER", JetClassInitializer.class);
+    JetPlaceHolderStubElementType<JetSecondaryConstructor> SECONDARY_CONSTRUCTOR =
+            new JetPlaceHolderStubElementType<JetSecondaryConstructor>("SECONDARY_CONSTRUCTOR", JetSecondaryConstructor.class);
 
     JetParameterElementType VALUE_PARAMETER = new JetParameterElementType("VALUE_PARAMETER");
     JetPlaceHolderStubElementType<JetParameterList> VALUE_PARAMETER_LIST =
@@ -109,6 +111,8 @@ public interface JetStubElementTypes {
             new JetPlaceHolderStubElementType<JetDelegatorToSuperCall>("DELEGATOR_SUPER_CALL", JetDelegatorToSuperCall.class);
     JetPlaceHolderStubElementType<JetDelegatorToSuperClass> DELEGATOR_SUPER_CLASS =
             new JetPlaceHolderStubElementType<JetDelegatorToSuperClass>("DELEGATOR_SUPER_CLASS", JetDelegatorToSuperClass.class);
+    JetPlaceHolderStubElementType<JetConstructorDelegationCall> CONSTRUCTOR_DELEGATION_CALL =
+            new JetPlaceHolderStubElementType<JetConstructorDelegationCall>("CONSTRUCTOR_DELEGATION_CALL", JetConstructorDelegationCall.class);
     JetPlaceHolderStubElementType<JetConstructorCalleeExpression> CONSTRUCTOR_CALLEE =
             new JetPlaceHolderStubElementType<JetConstructorCalleeExpression>("CONSTRUCTOR_CALLEE", JetConstructorCalleeExpression.class);
 

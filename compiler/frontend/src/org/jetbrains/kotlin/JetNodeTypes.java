@@ -35,9 +35,10 @@ public interface JetNodeTypes {
     IElementType OBJECT_DECLARATION = JetStubElementTypes.OBJECT_DECLARATION;
     JetNodeType OBJECT_DECLARATION_NAME = new JetNodeType("OBJECT_DECLARATION_NAME", JetObjectDeclarationName.class);
 
-    IElementType CLASS_OBJECT          = JetStubElementTypes.CLASS_OBJECT;
-    IElementType ENUM_ENTRY            = JetStubElementTypes.ENUM_ENTRY;
-    IElementType ANONYMOUS_INITIALIZER = JetStubElementTypes.ANONYMOUS_INITIALIZER;
+    IElementType CLASS_OBJECT           = JetStubElementTypes.CLASS_OBJECT;
+    IElementType ENUM_ENTRY             = JetStubElementTypes.ENUM_ENTRY;
+    IElementType ANONYMOUS_INITIALIZER  = JetStubElementTypes.ANONYMOUS_INITIALIZER;
+    IElementType SECONDARY_CONSTRUCTOR  = JetStubElementTypes.SECONDARY_CONSTRUCTOR;
 
     IElementType TYPE_PARAMETER_LIST                 = JetStubElementTypes.TYPE_PARAMETER_LIST;
     IElementType TYPE_PARAMETER                      = JetStubElementTypes.TYPE_PARAMETER;
@@ -79,6 +80,8 @@ public interface JetNodeTypes {
     IElementType INITIALIZER_LIST        = JetStubElementTypes.INITIALIZER_LIST;
     IElementType TYPE_CONSTRAINT_LIST    = JetStubElementTypes.TYPE_CONSTRAINT_LIST;
     IElementType TYPE_CONSTRAINT         = JetStubElementTypes.TYPE_CONSTRAINT;
+
+    IElementType CONSTRUCTOR_DELEGATION_CALL = JetStubElementTypes.CONSTRUCTOR_DELEGATION_CALL;
 
     // TODO: Not sure if we need separate NT for each kind of constants
     JetNodeType NULL               = new JetNodeType("NULL", JetConstantExpression.class);

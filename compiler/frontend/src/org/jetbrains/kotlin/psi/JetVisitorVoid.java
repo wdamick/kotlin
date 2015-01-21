@@ -37,6 +37,10 @@ public class JetVisitorVoid extends JetVisitor<Void, Void> {
         super.visitClassObject(classObject, null);
     }
 
+    public void visitSecondaryConstructor(@NotNull JetSecondaryConstructor constructor) {
+        super.visitSecondaryConstructor(constructor, null);
+    }
+
     public void visitNamedFunction(@NotNull JetNamedFunction function) {
         super.visitNamedFunction(function, null);
     }
@@ -131,6 +135,10 @@ public class JetVisitorVoid extends JetVisitor<Void, Void> {
 
     public void visitDelegationToSuperClassSpecifier(@NotNull JetDelegatorToSuperClass specifier) {
         super.visitDelegationToSuperClassSpecifier(specifier, null);
+    }
+
+    public void visitConstructorDelegationCall(@NotNull JetConstructorDelegationCall call) {
+        super.visitConstructorDelegationCall(call, null);
     }
 
     public void visitPropertyDelegate(@NotNull JetPropertyDelegate delegate) {
@@ -439,6 +447,12 @@ public class JetVisitorVoid extends JetVisitor<Void, Void> {
     }
 
     @Override
+    public final Void visitSecondaryConstructor(@NotNull JetSecondaryConstructor constructor, Void data) {
+        visitSecondaryConstructor(constructor);
+        return null;
+    }
+
+    @Override
     public final Void visitNamedFunction(@NotNull JetNamedFunction function, Void data) {
         visitNamedFunction(function);
         return null;
@@ -575,6 +589,12 @@ public class JetVisitorVoid extends JetVisitor<Void, Void> {
     @Override
     public final Void visitDelegationToSuperClassSpecifier(@NotNull JetDelegatorToSuperClass specifier, Void data) {
         visitDelegationToSuperClassSpecifier(specifier);
+        return null;
+    }
+
+    @Override
+    public final Void visitConstructorDelegationCall(@NotNull JetConstructorDelegationCall call, Void data) {
+        visitConstructorDelegationCall(call);
         return null;
     }
 
