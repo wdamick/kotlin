@@ -75,6 +75,11 @@ public class K2JVMCompiler extends CLICompiler<K2JVMCompilerArguments> {
             configuration.put(JVMConfigurationKeys.INCREMENTAL_CACHE_PROVIDER, incrementalCacheProvider);
         }
 
+        FileLocator locator = services.get(FileLocator.class);
+        if (locator != null) {
+            configuration.put(JVMConfigurationKeys.FILE_LOCATOR, locator);
+        }
+
         try {
             configuration.addAll(JVMConfigurationKeys.CLASSPATH_KEY, getClasspath(paths, arguments));
             configuration.addAll(JVMConfigurationKeys.ANNOTATIONS_PATH_KEY, getAnnotationsPath(paths, arguments));
