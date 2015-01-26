@@ -130,6 +130,7 @@ private fun generatorForLazyBodyResolve() =
             field<ModuleDescriptor>(init = GivenExpression("analyzer.getModuleDescriptor()"), useAsContext = true)
 
             publicField<LazyTopDownAnalyzer>()
+            publicField<LazyTopDownAnalyzerForTopLevel>()
         }
 
 private fun generatorForTopDownAnalyzerForJs() =

@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.types.DynamicTypesSettings;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.platform.PlatformToKotlinClassMap;
 import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer;
+import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzerForTopLevel;
 import org.jetbrains.kotlin.resolve.lazy.ScopeProvider.AdditionalFileScopeProvider;
 import org.jetbrains.kotlin.resolve.lazy.DeclarationScopeProviderImpl;
 import org.jetbrains.kotlin.resolve.lazy.LazyDeclarationResolver;
@@ -81,6 +82,7 @@ public class InjectorForLazyBodyResolve {
     private final KotlinBuiltIns kotlinBuiltIns;
     private final PlatformToKotlinClassMap platformToKotlinClassMap;
     private final LazyTopDownAnalyzer lazyTopDownAnalyzer;
+    private final LazyTopDownAnalyzerForTopLevel lazyTopDownAnalyzerForTopLevel;
     private final AdditionalFileScopeProvider additionalFileScopeProvider;
     private final DeclarationScopeProviderImpl declarationScopeProvider;
     private final LazyDeclarationResolver lazyDeclarationResolver;
@@ -136,6 +138,7 @@ public class InjectorForLazyBodyResolve {
         this.kotlinBuiltIns = moduleDescriptor.getBuiltIns();
         this.platformToKotlinClassMap = moduleDescriptor.getPlatformToKotlinClassMap();
         this.lazyTopDownAnalyzer = new LazyTopDownAnalyzer();
+        this.lazyTopDownAnalyzerForTopLevel = new LazyTopDownAnalyzerForTopLevel();
         this.additionalFileScopeProvider = new AdditionalFileScopeProvider();
         this.lazyDeclarationResolver = new LazyDeclarationResolver(globalContext, bindingTrace);
         this.declarationScopeProvider = new DeclarationScopeProviderImpl(lazyDeclarationResolver);
@@ -185,6 +188,9 @@ public class InjectorForLazyBodyResolve {
         this.lazyTopDownAnalyzer.setTopLevelDescriptorProvider(analyzer);
         this.lazyTopDownAnalyzer.setTrace(bindingTrace);
         this.lazyTopDownAnalyzer.setVarianceChecker(varianceChecker);
+
+        this.lazyTopDownAnalyzerForTopLevel.setKotlinCodeAnalyzer(analyzer);
+        this.lazyTopDownAnalyzerForTopLevel.setLazyTopDownAnalyzer(lazyTopDownAnalyzer);
 
         declarationScopeProvider.setFileScopeProvider(scopeProvider);
 
@@ -283,6 +289,10 @@ public class InjectorForLazyBodyResolve {
 
     public LazyTopDownAnalyzer getLazyTopDownAnalyzer() {
         return this.lazyTopDownAnalyzer;
+    }
+
+    public LazyTopDownAnalyzerForTopLevel getLazyTopDownAnalyzerForTopLevel() {
+        return this.lazyTopDownAnalyzerForTopLevel;
     }
 
 }
