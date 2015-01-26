@@ -44,8 +44,6 @@ class PartialBodyResolveFilter(
     private val nothingFunctionNames = HashSet(probablyNothingCallableNames.functionNames())
     private val nothingVariableNames = HashSet(probablyNothingCallableNames.propertyNames())
 
-    override val filter: ((JetElement) -> Boolean)? = { it is JetExpression && statementMarks.statementMark(it) != MarkLevel.SKIP }
-
     ;{
         assert(declaration.isAncestor(elementToResolve))
         assert(!JetPsiUtil.isLocal(declaration),
@@ -78,6 +76,13 @@ class PartialBodyResolveFilter(
         statementMarks.mark(elementToResolve, if (forCompletion) MarkLevel.NEED_COMPLETION else MarkLevel.NEED_REFERENCE_RESOLVE)
         declaration.blocks().forEach { processBlock(it) }
     }
+
+    override fun filterBlock(block: JetBlockExpression): List<JetElement> {
+        if (block is JetPsiUtil.JetExpressionWrapper) return block.getStatements()
+        return block.getStatements().filter { it is JetExpression && statementMarks.statementMark(it) != MarkLevel.SKIP }
+    }
+
+    override fun getLastStatementInABlock(block: JetBlockExpression) = filterBlock(block).lastOrNull()
 
     //TODO: do..while is special case
 

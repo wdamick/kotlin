@@ -17,10 +17,14 @@
 package org.jetbrains.kotlin.resolve
 
 import org.jetbrains.kotlin.psi.JetElement
+import org.jetbrains.kotlin.psi.JetBlockExpression
+import org.jetbrains.kotlin.psi.JetPsiUtil
 
 public open class PartialBodyResolveProvider {
-    public open val filter: ((JetElement) -> Boolean)?
-        get() = null
+
+    public open fun filterBlock(block: JetBlockExpression): List<JetElement> = block.getStatements()
+
+    public open fun getLastStatementInABlock(block: JetBlockExpression): JetElement? = JetPsiUtil.getLastStatementInABlock(block)
 
     class object {
         public val NONE: PartialBodyResolveProvider = PartialBodyResolveProvider()

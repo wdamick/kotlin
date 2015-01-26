@@ -210,12 +210,7 @@ public class ExpressionTypingServices {
             @NotNull CoercionStrategy coercionStrategyForLastExpression,
             @NotNull ExpressionTypingContext context
     ) {
-        List<JetElement> block = expression.getStatements();
-
-        Function1<JetElement, Boolean> filter = getPartialBodyResolveProvider().getFilter();
-        if (filter != null && !(expression instanceof JetPsiUtil.JetExpressionWrapper)) {
-            block = KotlinPackage.filter(block, filter);
-        }
+        List<JetElement> block = getPartialBodyResolveProvider().filterBlock(expression);
 
         // SCRIPT: get code descriptor for script declaration
         DeclarationDescriptor containingDescriptor = context.scope.getContainingDeclaration();
@@ -235,7 +230,8 @@ public class ExpressionTypingServices {
             r = DataFlowUtils.checkType(builtIns.getUnitType(), expression, context, context.dataFlowInfo);
         }
         else {
-            r = getBlockReturnedTypeWithWritableScope(scope, block, coercionStrategyForLastExpression, context);
+            r = getBlockReturnedTypeWithWritableScope(scope, block, coercionStrategyForLastExpression,
+                                                      context.replacePartialBodyResolveProvider(getPartialBodyResolveProvider()));
         }
         scope.changeLockLevel(WritableScope.LockLevel.READING);
 

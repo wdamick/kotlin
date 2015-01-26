@@ -346,7 +346,7 @@ public class AnnotationResolver {
                 CompileTimeConstant<?> constant = ConstantExpressionEvaluator.OBJECT$.evaluate(argumentExpression, trace, expectedType);
                 if (constant instanceof IntegerValueTypeConstant) {
                     JetType defaultType = ((IntegerValueTypeConstant) constant).getType(expectedType);
-                    ArgumentTypeResolver.updateNumberType(defaultType, argumentExpression, trace);
+                    ArgumentTypeResolver.updateNumberType(defaultType, argumentExpression, trace, null);
                 }
                 if (constant != null) {
                     constants.add(constant);

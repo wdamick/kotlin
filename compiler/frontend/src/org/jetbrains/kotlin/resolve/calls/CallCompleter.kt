@@ -226,7 +226,7 @@ public class CallCompleter(
         if (valueArgument.isExternal()) return
 
         val expression = valueArgument.getArgumentExpression()
-        val deparenthesized = ArgumentTypeResolver.deparenthesizeArgument(expression)
+        val deparenthesized = ArgumentTypeResolver.deparenthesizeArgument(expression, context.partialBodyResolveProvider)
         if (deparenthesized == null) return
 
         val recordedType = context.trace[BindingContext.EXPRESSION_TYPE, expression]

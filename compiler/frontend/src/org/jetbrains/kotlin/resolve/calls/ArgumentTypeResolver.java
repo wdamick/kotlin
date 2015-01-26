@@ -143,7 +143,7 @@ public class ArgumentTypeResolver {
 
     @Nullable
     private static JetFunctionLiteralExpression getFunctionLiteralArgumentIfAny(@NotNull JetExpression expression) {
-        JetExpression deparenthesizedExpression = deparenthesizeArgument(expression);
+        JetExpression deparenthesizedExpression = deparenthesizeArgument(expression, null);
         if (deparenthesizedExpression instanceof JetFunctionLiteralExpression) {
             return (JetFunctionLiteralExpression) deparenthesizedExpression;
         }
@@ -151,16 +151,22 @@ public class ArgumentTypeResolver {
     }
 
     @Nullable
-    public static JetExpression deparenthesizeArgument(@Nullable JetExpression expression) {
+    public static JetExpression deparenthesizeArgument(
+            @Nullable JetExpression expression,
+            @Nullable PartialBodyResolveProvider partialBodyResolveProvider
+    ) {
         JetExpression deparenthesizedExpression = JetPsiUtil.deparenthesize(expression, false);
         if (deparenthesizedExpression instanceof JetBlockExpression) {
+            JetBlockExpression blockExpression = (JetBlockExpression) deparenthesizedExpression;
             // todo
             // This case is a temporary hack for 'if' branches.
             // The right way to implement this logic is to interpret 'if' branches as function literals with explicitly-typed signatures
             // (no arguments and no receiver) and therefore analyze them straight away (not in the 'complete' phase).
-            JetElement lastStatementInABlock = JetPsiUtil.getLastStatementInABlock((JetBlockExpression) deparenthesizedExpression);
+            JetElement lastStatementInABlock = partialBodyResolveProvider != null
+                                               ? partialBodyResolveProvider.getLastStatementInABlock(blockExpression)
+                                               : JetPsiUtil.getLastStatementInABlock(blockExpression);
             if (lastStatementInABlock instanceof JetExpression) {
-                return deparenthesizeArgument((JetExpression) lastStatementInABlock);
+                return deparenthesizeArgument((JetExpression) lastStatementInABlock, partialBodyResolveProvider);
             }
         }
         return deparenthesizedExpression;
@@ -240,7 +246,7 @@ public class ArgumentTypeResolver {
         return defaultValue;
     }
 
-    public <D extends CallableDescriptor> void analyzeArgumentsAndRecordTypes(
+    public void analyzeArgumentsAndRecordTypes(
             @NotNull CallResolutionContext<?> context
     ) {
         MutableDataFlowInfoForArguments infoForArguments = context.dataFlowInfoForArguments;
@@ -266,7 +272,7 @@ public class ArgumentTypeResolver {
             if (type.getConstructor() instanceof IntegerValueTypeConstructor) {
                 IntegerValueTypeConstructor constructor = (IntegerValueTypeConstructor) type.getConstructor();
                 JetType primitiveType = TypeUtils.getPrimitiveNumberType(constructor, context.expectedType);
-                updateNumberType(primitiveType, expression, context.trace);
+                updateNumberType(primitiveType, expression, context.trace, context.partialBodyResolveProvider);
                 return primitiveType;
             }
         }
@@ -276,15 +282,16 @@ public class ArgumentTypeResolver {
     public static void updateNumberType(
             @NotNull JetType numberType,
             @Nullable JetExpression expression,
-            @NotNull BindingTrace trace
+            @NotNull BindingTrace trace,
+            @Nullable PartialBodyResolveProvider partialBodyResolveProvider
     ) {
         if (expression == null) return;
         BindingContextUtils.updateRecordedType(numberType, expression, trace, false);
 
         if (!(expression instanceof JetConstantExpression)) {
-            JetExpression deparenthesized = deparenthesizeArgument(expression);
+            JetExpression deparenthesized = deparenthesizeArgument(expression, partialBodyResolveProvider);
             if (deparenthesized != expression) {
-                updateNumberType(numberType, deparenthesized, trace);
+                updateNumberType(numberType, deparenthesized, trace, partialBodyResolveProvider);
             }
             return;
         }
