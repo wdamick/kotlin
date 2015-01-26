@@ -66,6 +66,7 @@ private class ClassClsStubBuilder(
             supertypeIds
         }
     }
+    private val classObjectName = classProto.getClassObject()?.getClassObjectName()?.let { c.nameResolver.getName(it) }
 
     private val classOrObjectStub = createClassOrObjectStubAndModifierListStub()
 
@@ -174,7 +175,7 @@ private class ClassClsStubBuilder(
             return
         }
 
-        val classObjectId = classId.createNestedClassId(c.nameResolver.getName(classProto.getClassObject().getClassObjectName()))
+        val classObjectId = classId.createNestedClassId(classObjectName)
         createNestedClassStub(classBody, classObjectId)
     }
 
@@ -210,8 +211,11 @@ private class ClassClsStubBuilder(
 
     private fun createInnerAndNestedClasses(classBody: KotlinPlaceHolderStubImpl<JetClassBody>) {
         classProto.getNestedClassNameList().forEach { id ->
-            val nestedClassId = classId.createNestedClassId(c.nameResolver.getName(id))
-            createNestedClassStub(classBody, nestedClassId)
+            val nestedClassName = c.nameResolver.getName(id)
+            if (nestedClassName != classObjectName) {
+                val nestedClassId = classId.createNestedClassId(nestedClassName)
+                createNestedClassStub(classBody, nestedClassId)
+            }
         }
     }
 
