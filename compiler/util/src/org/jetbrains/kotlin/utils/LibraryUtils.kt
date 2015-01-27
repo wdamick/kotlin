@@ -34,6 +34,8 @@ import javax.xml.bind.DatatypeConverter.printBase64Binary
 import java.util.zip.GZIPOutputStream
 import javax.xml.bind.DatatypeConverter
 import java.util.zip.GZIPInputStream
+import java.util.regex.Pattern
+import java.util.ArrayList
 
 public object LibraryUtils {
     private val LOG = Logger.getInstance(javaClass<LibraryUtils>())
@@ -45,7 +47,8 @@ public object LibraryUtils {
     private val METAINF = "META-INF/"
     private val MANIFEST_PATH = "${METAINF}MANIFEST.MF"
     private val METAINF_RESOURCES = "${METAINF}resources/"
-    private val KOTLIN_JS_MODULE_ATTRIBUTE_NAME = Attributes.Name(KOTLIN_JS_MODULE_NAME);
+    private val KOTLIN_JS_MODULE_ATTRIBUTE_NAME = Attributes.Name(KOTLIN_JS_MODULE_NAME)
+    private val METADATA_PATTERN = Pattern.compile("(?m)Kotlin\\.metadata\\((\\d+),\\s*\"([^\"]*)\",\\s*\"([^\"]*)\"\\)")
     private val ABI_VERSION = 1
 
     {
@@ -117,30 +120,73 @@ public object LibraryUtils {
     platformStatic
     public fun writeMetadata(moduleName: String, packages: Set<String>, content: Map<String, ByteArray>, metaFile: File) {
         val stringBuilder = StringBuilder()
+        stringBuilder.append("(function (Kotlin) {\n")
+        stringBuilder.append("    Kotlin.metadata(")
         stringBuilder.append(ABI_VERSION)
         stringBuilder.append(",")
-        stringBuilder.append(moduleName)
-        stringBuilder.append(";")
-        stringBuilder.append(packagesAndContentToBase64(packages, content))
+        stringBuilder.append("\"$moduleName\"")
+        stringBuilder.append(",")
+        stringBuilder.append("\"${packagesAndContentToBase64(packages, content)}\"")
+        stringBuilder.append(");\n")
+        stringBuilder.append("}(Kotlin));\n")
         FileUtil.writeToFile(metaFile, stringBuilder.toString())
     }
 
     public class Metadata(val abiVersion: Int, val moduleName: String, val packages: Array<String>, val files: Map<String, ByteArray>)
 
     platformStatic
-    public fun loadMetadata(text: String): Metadata {
-        val index0 = text.indexOf(',')
-        assert(index0 > 0)
-        val abiVersion = Integer.parseInt(text.substring(0, index0))
+    public fun haveMetadata(text: String): Boolean = METADATA_PATTERN.matcher(text).find()
 
-        val index1 = text.indexOf(';')
-        assert(index1 > 0)
-        val moduleName = text.substring(index0 + 1, index1)
-        val body = parseBase64Binary(text.substring(index1 + 1))
+    platformStatic
+    public fun loadMetadataFromLibrary(library: String): List<Metadata> {
+        val file = File(library)
+        assert(file.exists()) { "Library " + library + " not found" }
+
+        var result: MutableList<Metadata> = arrayListOf()
+        if (file.isDirectory()) {
+            loadMetadataFromDirectory(file, result)
+        }
+        else {
+            loadMetadataFromZip(file, result)
+        }
+        return result
+    }
+
+    platformStatic
+    public fun loadMetadata(text: String): Metadata {
+        val metadataList = parseMetadata(text)
+        assert(metadataList.size() == 1)
+        return metadataList[0]
+    }
+
+    private fun parseMetadata(text: String): List<Metadata> {
+        var result: MutableList<Metadata> = arrayListOf()
+        val matcher = METADATA_PATTERN.matcher(text)
+        while (matcher.find()) {
+            var abiVersion = Integer.parseInt(matcher.group(1));
+            var moduleName = matcher.group(2)
+            val data = matcher.group(3)
+            result.add(loadMetadata(abiVersion, moduleName, data))
+        }
+        return result
+    }
+
+    private fun parseMetadata(text: String, metadataList: MutableList<Metadata>) {
+        val matcher = METADATA_PATTERN.matcher(text)
+        while (matcher.find()) {
+            var abiVersion = Integer.parseInt(matcher.group(1));
+            var moduleName = matcher.group(2)
+            val data = matcher.group(3)
+            metadataList.add(loadMetadata(abiVersion, moduleName, data))
+        }
+    }
+
+    // TODO throw exception on error
+    private fun loadMetadata(abiVersion: Int, moduleName: String, data: String): Metadata {
+        val body = parseBase64Binary(data)
         val gzip = GZIPInputStream(ByteArrayInputStream(body))
         val reader = BufferedReader(InputStreamReader(gzip, "UTF-8"))
-        val content =  reader.readLine()
-        reader.close()
+        val content =  try { reader.readLine() } finally { reader.close() }
         val packages = getPackages(content)
         val files = getContent(content)
         return Metadata(abiVersion, moduleName, packages, files)
@@ -191,7 +237,7 @@ public object LibraryUtils {
         return printBase64Binary(byteStream.toByteArray())
     }
 
-    private fun copyJsFilesFromDirectory(dir: File, outputLibraryJsPath: String) {
+    private fun processDirectory(dir: File, action: (File, String) -> Unit) {
         FileUtil.processFilesRecursively(dir, object : Processor<File> {
             override fun process(file: File): Boolean {
                 var relativePath = FileUtil.getRelativePath(dir, file)
@@ -200,32 +246,61 @@ public object LibraryUtils {
                     relativePath = getSuggestedPath(relativePath)
                     if (relativePath == null) return true
 
-                    try {
-                        val copyFile = File(outputLibraryJsPath, relativePath)
-                        FileUtil.copy(file, copyFile)
-                    }
-                    catch (ex: IOException) {
-                        LOG.error("Could not copy " + relativePath + " from " + dir + ": " + ex.getMessage())
-                    }
-
+                    action(file, relativePath)
                 }
                 return true
             }
         })
     }
 
+    // TODO Refactor
+    private fun loadMetadataFromDirectory(dir: File, metadataList: MutableList<Metadata>) {
+        processDirectory(dir) { file, relativePath ->
+            try {
+                val content = FileUtil.loadFile(file)
+                parseMetadata(content, metadataList)
+            }
+            catch (ex: IOException) {
+                LOG.error("Could not read " + relativePath + " from " + dir + ": " + ex.getMessage())
+            }
+        }
+    }
+
+    private fun copyJsFilesFromDirectory(dir: File, outputLibraryJsPath: String) {
+        processDirectory(dir) { file, relativePath ->
+            try {
+                val copyFile = File(outputLibraryJsPath, relativePath)
+                FileUtil.copy(file, copyFile)
+            }
+            catch (ex: IOException) {
+                LOG.error("Could not copy " + relativePath + " from " + dir + ": " + ex.getMessage())
+            }
+        }
+    }
+
+    private fun loadMetadataFromZip(file: File, metadataList: MutableList<Metadata>) {
+        traverseArchiveWithReportingIOException(file) { content, relativePath ->
+            parseMetadata(content, metadataList)
+        }
+    }
+
     private fun copyJsFilesFromZip(file: File, outputLibraryJsPath: String) {
+        traverseArchiveWithReportingIOException(file) { content, relativePath ->
+            val outputFile = File(outputLibraryJsPath, relativePath)
+            FileUtil.writeToFile(outputFile, content)
+        }
+    }
+
+    private fun traverseArchiveWithReportingIOException(file: File, action: (String, String) -> Unit) {
         try {
-            traverseArchive(file, outputLibraryJsPath)
+            traverseArchive(file, action)
         }
         catch (ex: IOException) {
             LOG.error("Could not extract javascript files from  " + file.getName() + ": " + ex.getMessage())
         }
-
     }
 
-    throws(javaClass<IOException>())
-    private fun traverseArchive(file: File, outputLibraryJsPath: String) {
+    private fun traverseArchive(file: File, action: (String, String) -> Unit) {
         val zipFile = ZipFile(file.getPath())
         try {
             val zipEntries = zipFile.entries()
@@ -238,8 +313,7 @@ public object LibraryUtils {
 
                     val stream = zipFile.getInputStream(entry)
                     val content = FileUtil.loadTextAndClose(stream)
-                    val outputFile = File(outputLibraryJsPath, relativePath)
-                    FileUtil.writeToFile(outputFile, content)
+                    action(content, relativePath)
                 }
             }
         }
