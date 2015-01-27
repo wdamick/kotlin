@@ -414,7 +414,7 @@ public class DescriptorResolver {
                 Collections.<ValueParameterDescriptor>emptyList(),
                 returnType,
                 Modality.FINAL,
-                property.getVisibility()
+                screenLocal(property.getVisibility())
         );
 
         trace.record(BindingContext.DATA_CLASS_COMPONENT_FUNCTION, parameter, functionDescriptor);
@@ -462,11 +462,15 @@ public class DescriptorResolver {
                 parameterDescriptors,
                 returnType,
                 Modality.FINAL,
-                classDescriptor.getVisibility()
+                screenLocal(classDescriptor.getVisibility())
         );
 
         trace.record(BindingContext.DATA_CLASS_COPY_FUNCTION, classDescriptor, functionDescriptor);
         return functionDescriptor;
+    }
+
+    private static Visibility screenLocal(Visibility classVisibility) {
+        return classVisibility == Visibilities.LOCAL ? Visibilities.PUBLIC : classVisibility;
     }
 
     public static Visibility getDefaultVisibility(JetModifierListOwner modifierListOwner, DeclarationDescriptor containingDescriptor) {
