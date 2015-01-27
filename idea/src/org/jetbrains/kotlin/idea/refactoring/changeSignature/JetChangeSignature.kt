@@ -37,11 +37,17 @@ import com.intellij.refactoring.RefactoringBundle
 import org.jetbrains.kotlin.resolve.OverrideResolver
 
 public trait JetChangeSignatureConfiguration {
-    fun configure(changeSignatureData: JetChangeSignatureData, bindingContext: BindingContext)
+    fun configure(originalDescriptor: JetMethodDescriptor, bindingContext: BindingContext): JetMethodDescriptor
 
     fun performSilently(affectedFunctions: Collection<PsiElement>): Boolean {
         return false
     }
+}
+
+fun JetMethodDescriptor.modify(action: JetMutableMethodDescriptor.() -> Unit): JetMethodDescriptor {
+    val newDescriptor = JetMutableMethodDescriptor(this)
+    newDescriptor.action()
+    return newDescriptor
 }
 
 public fun runChangeSignature(project: Project,
@@ -145,9 +151,9 @@ public class JetChangeSignature(val project: Project,
             return null
         }
 
-        val changeSignatureData = JetChangeSignatureData(baseDescriptor, functionDeclaration, descriptorsForSignatureChange)
-        configuration.configure(changeSignatureData, bindingContext)
-        return JetChangeSignatureDialog(project, changeSignatureData, defaultValueContext, commandName)
+        val originalDescriptor = JetChangeSignatureData(baseDescriptor, functionDeclaration, descriptorsForSignatureChange)
+        val adjustedDescriptor = configuration.configure(originalDescriptor, bindingContext)
+        return JetChangeSignatureDialog(project, adjustedDescriptor, defaultValueContext, commandName)
     }
 
     private fun checkModifiable(function: PsiElement): Boolean {

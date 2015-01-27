@@ -461,9 +461,11 @@ public class JetChangeSignatureDialog extends ChangeSignatureDialogBase<
         }
 
         String returnTypeText = myReturnTypeCodeFragment != null ? myReturnTypeCodeFragment.getText().trim() : "";
-        return new JetChangeInfo(myMethod, getMethodName(), getReturnType(), returnTypeText,
-                                 getVisibility(), parameters, myParametersTableModel.getReceiver(), myDefaultValueContext
-        );
+        JetMethodDescriptor descriptor = myMethod instanceof JetMutableMethodDescriptor
+                                         ? ((JetMutableMethodDescriptor) myMethod).getOriginal()
+                                         : myMethod;
+        return new JetChangeInfo(descriptor, getMethodName(), getReturnType(), returnTypeText,
+                                 getVisibility(), parameters, myParametersTableModel.getReceiver(), myDefaultValueContext);
     }
 
     @Override
