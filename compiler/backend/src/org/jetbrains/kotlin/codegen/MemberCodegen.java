@@ -139,7 +139,7 @@ public abstract class MemberCodegen<T extends JetElement/* TODO: & JetDeclaratio
         if (sourceMapper != null) {
             Collection<RawFileMapping> mapping = sourceMapper.getFileMappings().values();
             for (RawFileMapping fileMapping : mapping) {
-                addSMAP(fileMapping.toFileMapping());
+                v.addSMAP(fileMapping.toFileMapping());
             }
         }
 
@@ -461,10 +461,6 @@ public abstract class MemberCodegen<T extends JetElement/* TODO: & JetDeclaratio
     @Override
     public String toString() {
         return context.toString();
-    }
-
-    public void addSMAP(FileMapping fm) {
-        v.addSMAP(fm);
     }
 
     public SourceMapper getSourceMapper() {
