@@ -283,9 +283,9 @@
 
     <target name="js-stdlib">
         <property name="compiled.builtins.js" value="builtins.js"/>
-        <property name="compiled.builtins.js.meta" value="builtins_meta.txt"/>
+        <property name="compiled.builtins.js.meta" value="builtins.meta.js"/>
         <property name="compiled.stdlib.js" value="stdlib.js"/>
-        <property name="compiled.stdlib.js.meta" value="stdlib_meta.txt"/>
+        <property name="compiled.stdlib.js.meta" value="stdlib.meta.js"/>
         <property name="stdlib.js.dir" value="${basedir}/js/js.translator/testData"/>
 
         <new-kotlin2js output="${output}/${compiled.builtins.js}" meta="${output}/${compiled.builtins.js.meta}">
