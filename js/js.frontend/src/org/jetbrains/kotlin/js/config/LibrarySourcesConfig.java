@@ -22,6 +22,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.*;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import kotlin.Function1;
 import kotlin.Function2;
@@ -106,7 +107,7 @@ public class LibrarySourcesConfig extends Config {
         final List<JetFile> jetFiles = new ArrayList<JetFile>();
         final PsiManager psiManager = PsiManager.getInstance(getProject());
 
-        final Function1<String, Unit> report = new Function1<String, Unit>() {
+        Function1<String, Unit> report = new Function1<String, Unit>() {
             @Override
             public Unit invoke(String message) {
                 throw new IllegalStateException(message);
@@ -116,13 +117,7 @@ public class LibrarySourcesConfig extends Config {
         Function2<String, VirtualFile, Unit> action = new Function2<String, VirtualFile, Unit>() {
             @Override
             public Unit invoke(String moduleName, VirtualFile file) {
-                String metaInfo = moduleName + "_meta.txt";
-                VirtualFile meta = file.findFileByRelativePath(metaInfo);
-
-                 if (meta != null) {
-                    loadModuleDescriptors(moduleName, meta, report);
-                    return Unit.INSTANCE$;
-                 }
+                loadMetadata(PathUtil.getLocalPath(file));
 
                 JetFileCollector jetFileCollector = new JetFileCollector(jetFiles, moduleName, psiManager);
                 VfsUtilCore.visitChildrenRecursively(file, jetFileCollector);
@@ -136,18 +131,15 @@ public class LibrarySourcesConfig extends Config {
         return jetFiles;
     }
 
-    private void loadModuleDescriptors(String moduleName, VirtualFile metaFile, Function1<String, Unit> report) {
-        ModuleDescriptorImpl moduleDescriptor = TopDownAnalyzerFacadeForJS.createJsModule("<" + moduleName + ">");
+    private void loadMetadata(String libraryPath) {
+        List<LibraryUtils.Metadata> metadataList = LibraryUtils.loadMetadataFromLibrary(libraryPath);
+        for(LibraryUtils.Metadata metadata : metadataList) {
+            loadModuleDescriptor(metadata);
+        }
+    }
 
-        String fileContent;
-        try {
-            fileContent = new String(metaFile.contentsToByteArray(false), metaFile.getCharset());
-        }
-        catch(IOException ex) {
-            report.invoke("Error while reading file: " + metaFile.getCanonicalPath() + " " + ex.getMessage());
-            return;
-        }
-        LibraryUtils.Metadata metadata = LibraryUtils.loadMetadata(fileContent);
+    private void loadModuleDescriptor(LibraryUtils.Metadata metadata) {
+        ModuleDescriptorImpl moduleDescriptor = TopDownAnalyzerFacadeForJS.createJsModule("<" + metadata.getModuleName() + ">");
         final Map<String, byte[]> descriptors = metadata.getFiles();
 
         Function1<String, InputStream> load = new Function1<String, InputStream>() {
