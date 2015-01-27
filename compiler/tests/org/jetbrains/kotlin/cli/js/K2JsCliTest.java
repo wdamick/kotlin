@@ -74,7 +74,7 @@ public class K2JsCliTest extends CliBaseTest {
     public void createMetadata() throws Exception {
         executeCompilerCompareOutputJS();
 
-        Assert.assertTrue(new File(tmpdir.getTmpDir(), "jslib-example_meta.txt").isFile());
+        Assert.assertTrue(new File(tmpdir.getTmpDir(), "jslib-example.meta.js").isFile());
         Assert.assertTrue(new File(tmpdir.getTmpDir(), "jslib-example.js").isFile());
     }
 
