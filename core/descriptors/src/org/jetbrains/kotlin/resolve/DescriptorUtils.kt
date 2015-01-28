@@ -29,7 +29,7 @@ public fun ClassDescriptor.getClassObjectReferenceTarget(): ClassDescriptor {
 public fun ClassDescriptor.hasSyntheticClassObject(): Boolean = getKind() in setOf(ENUM_ENTRY, OBJECT)
 
 public fun DeclarationDescriptor.getImportableDescriptor(): DeclarationDescriptor =
-        if (this is ConstructorDescriptor || DescriptorUtils.isClassObject(this)) getContainingDeclaration()!! else this
+        if (this is ConstructorDescriptor) getContainingDeclaration()!! else this
 
 public val DeclarationDescriptor.isExtension: Boolean
     get() = this is CallableDescriptor && getExtensionReceiverParameter() != null

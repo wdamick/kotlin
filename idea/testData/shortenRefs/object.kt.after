@@ -1,0 +1,24 @@
+package p.q
+
+fun foo(): Int {
+    InnerObj.D.foo()
+    InnerObj.D.coProp + 10
+    InnerObj.D
+
+    TopLevel.foo()
+    TopLevel
+}
+
+class InnerObj {
+    object D {
+        val coProp = 1
+
+        fun foo() {
+
+        }
+    }
+}
+
+object TopLevel {
+    fun foo() {}
+}

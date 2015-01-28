@@ -61,6 +61,12 @@ public class ShortenRefsTestGenerated extends AbstractShortenRefsTest {
         doTest(fileName);
     }
 
+    @TestMetadata("object.kt")
+    public void testObject() throws Exception {
+        String fileName = JetTestUtils.navigationMetadata("idea/testData/shortenRefs/object.kt");
+        doTest(fileName);
+    }
+
     @TestMetadata("idea/testData/shortenRefs/constructor")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

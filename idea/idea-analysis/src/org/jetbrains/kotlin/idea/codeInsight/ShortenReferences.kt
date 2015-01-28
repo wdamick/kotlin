@@ -253,7 +253,13 @@ public object ShortenReferences {
             val selector = qualifiedExpression.getSelectorExpression() ?: return false
             val callee = selector.getCalleeExpressionIfAny() as? JetReferenceExpression ?: return false
             val targetBefore = callee.getTargets(context).singleOrNull() ?: return false
+            val isDirectClassObjectAccess = DescriptorUtils.isClassObject(targetBefore)
+                                            && (qualifiedExpression.getReceiverExpression().getCalleeExpressionIfAny() as? JetReferenceExpression)?.getTargets(context)?.singleOrNull() in listOf(targetBefore, targetBefore.getContainingDeclaration())
 
+            if (isDirectClassObjectAccess) {
+                println(qualifiedExpression.getText())
+                return false
+            }
             val scope = context[BindingContext.RESOLUTION_SCOPE, qualifiedExpression] ?: return false
             val selectorCopy = selector.copy() as JetReferenceExpression
             val newContext = selectorCopy.analyzeInContext(scope)
@@ -262,7 +268,7 @@ public object ShortenReferences {
             when (targetsAfter.size()) {
                 0 -> return importInserter.addImport(targetBefore)
 
-                1 -> if (targetBefore == targetsAfter.first()) return true
+                1 -> if (targetBefore.u == targetsAfter.first().u) return true
             }
 
             if (importInserter.optimizeImports()) {
@@ -303,10 +309,7 @@ public object ShortenReferences {
         private var optimizeImports = true
 
         fun addImport(target: DeclarationDescriptor): Boolean {
-            val realTarget = if (DescriptorUtils.isClassObject(target)) // references to class object are treated as ones to its owner class
-                target.getContainingDeclaration() as? ClassDescriptor ?: return false
-            else
-                target
+            val realTarget = target.u
 
             if (realTarget !is ClassDescriptor && realTarget !is PackageViewDescriptor) return false
             if (realTarget.getContainingDeclaration() is ClassDescriptor) return false // do not insert imports for nested classes
@@ -323,3 +326,6 @@ public object ShortenReferences {
         }
     }
 }
+
+private val DeclarationDescriptor.u: DeclarationDescriptor
+    get() = if (DescriptorUtils.isClassObject(this) && this.getContainingDeclaration() is ClassDescriptor) this.getContainingDeclaration() else this

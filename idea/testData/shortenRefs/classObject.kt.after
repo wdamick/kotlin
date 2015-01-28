@@ -1,14 +1,30 @@
 package p.q
 
 fun foo(): Int {
-    MyClass.foo()
-    return MyClass.coProp + 10
+    DefaultClassObject.foo()
+    DefaultClassObject.coProp + 10
+    DefaultClassObject.Default.foo()
+    DefaultClassObject.Default
+    DefaultClassObject
+
+    NamedClassObject.foo()
+    NamedClassObject.Named.foo()
+    NamedClassObject.Named
+    NamedClassObject
 }
 
-class MyClass {
+class DefaultClassObject {
     class object {
         val coProp = 1
 
+        fun foo() {
+
+        }
+    }
+}
+
+class NamedClassObject {
+    class object Named {
         fun foo() {
 
         }
