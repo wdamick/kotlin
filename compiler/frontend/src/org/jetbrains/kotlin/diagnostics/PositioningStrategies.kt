@@ -52,8 +52,10 @@ public object PositioningStrategies {
                     return markRange(objectKeyword, delegationSpecifierList)
                 }
                 is JetObjectDeclaration -> {
-                    val start = element.getClassKeyword() ?: element.getObjectKeyword()
-                    return markRange(start, element.getObjectKeyword())
+                    return markRange(
+                            element.getClassKeyword() ?: element.getObjectKeyword(),
+                            element.getNameIdentifier() ?: element.getObjectKeyword()
+                    )
                 }
                 else -> {
                     return super.mark(element)
