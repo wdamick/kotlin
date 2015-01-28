@@ -20,13 +20,19 @@ import org.jetbrains.kotlin.psi.JetElement
 import org.jetbrains.kotlin.psi.JetBlockExpression
 import org.jetbrains.kotlin.psi.JetPsiUtil
 
-public open class PartialBodyResolveProvider {
+public open class ExpressionFilter {
 
-    public open fun filterBlock(block: JetBlockExpression): List<JetElement> = block.getStatements()
-
-    public open fun getLastStatementInABlock(block: JetBlockExpression): JetElement? = JetPsiUtil.getLastStatementInABlock(block)
+    public open val filter: ((JetElement) -> Boolean)?
+        get() = null
 
     class object {
-        public val NONE: PartialBodyResolveProvider = PartialBodyResolveProvider()
+        public val NONE: ExpressionFilter = ExpressionFilter()
     }
 }
+
+fun ExpressionFilter.filterStatements(block: JetBlockExpression): List<JetElement> {
+    if (filter == null || block is JetPsiUtil.JetExpressionWrapper) return block.getStatements()
+    return block.getStatements().filter { filter!!(it) }
+}
+
+fun ExpressionFilter.getLastStatementInABlock(block: JetBlockExpression) = filterStatements(block).lastOrNull()

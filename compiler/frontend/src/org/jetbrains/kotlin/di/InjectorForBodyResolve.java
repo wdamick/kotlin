@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.platform.PlatformToKotlinClassMap;
 import org.jetbrains.kotlin.resolve.AdditionalCheckerProvider;
-import org.jetbrains.kotlin.resolve.PartialBodyResolveProvider;
+import org.jetbrains.kotlin.resolve.ExpressionFilter;
 import org.jetbrains.kotlin.resolve.BodyResolver;
 import org.jetbrains.kotlin.resolve.AnnotationResolver;
 import org.jetbrains.kotlin.resolve.calls.CallResolver;
@@ -67,7 +67,7 @@ public class InjectorForBodyResolve {
     private final KotlinBuiltIns kotlinBuiltIns;
     private final PlatformToKotlinClassMap platformToKotlinClassMap;
     private final AdditionalCheckerProvider additionalCheckerProvider;
-    private final PartialBodyResolveProvider partialBodyResolveProvider;
+    private final ExpressionFilter expressionFilter;
     private final BodyResolver bodyResolver;
     private final AnnotationResolver annotationResolver;
     private final CallResolver callResolver;
@@ -102,7 +102,7 @@ public class InjectorForBodyResolve {
         @NotNull BindingTrace bindingTrace,
         @NotNull ModuleDescriptor moduleDescriptor,
         @NotNull AdditionalCheckerProvider additionalCheckerProvider,
-        @NotNull PartialBodyResolveProvider partialBodyResolveProvider
+        @NotNull ExpressionFilter expressionFilter
     ) {
         this.project = project;
         this.globalContext = globalContext;
@@ -112,7 +112,7 @@ public class InjectorForBodyResolve {
         this.kotlinBuiltIns = moduleDescriptor.getBuiltIns();
         this.platformToKotlinClassMap = moduleDescriptor.getPlatformToKotlinClassMap();
         this.additionalCheckerProvider = additionalCheckerProvider;
-        this.partialBodyResolveProvider = partialBodyResolveProvider;
+        this.expressionFilter = expressionFilter;
         this.bodyResolver = new BodyResolver();
         this.annotationResolver = new AnnotationResolver();
         this.callResolver = new CallResolver();
@@ -171,7 +171,7 @@ public class InjectorForBodyResolve {
         expressionTypingServices.setCallExpressionResolver(callExpressionResolver);
         expressionTypingServices.setCallResolver(callResolver);
         expressionTypingServices.setDescriptorResolver(descriptorResolver);
-        expressionTypingServices.setPartialBodyResolveProvider(partialBodyResolveProvider);
+        expressionTypingServices.setExpressionFilter(expressionFilter);
         expressionTypingServices.setProject(project);
         expressionTypingServices.setTypeResolver(typeResolver);
 

@@ -62,7 +62,7 @@ import org.jetbrains.kotlin.resolve.DelegatedPropertyResolver;
 import org.jetbrains.kotlin.resolve.TypeResolver;
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver;
 import org.jetbrains.kotlin.context.LazinessToken;
-import org.jetbrains.kotlin.resolve.PartialBodyResolveProvider;
+import org.jetbrains.kotlin.resolve.ExpressionFilter;
 import org.jetbrains.kotlin.resolve.calls.CallCompleter;
 import org.jetbrains.kotlin.resolve.calls.CandidateResolver;
 import org.jetbrains.kotlin.resolve.calls.tasks.TaskPrioritizer;
@@ -140,7 +140,7 @@ public class InjectorForReplWithJava {
     private final TypeResolver typeResolver;
     private final QualifiedExpressionResolver qualifiedExpressionResolver;
     private final LazinessToken lazinessToken;
-    private final PartialBodyResolveProvider partialBodyResolveProvider;
+    private final ExpressionFilter expressionFilter;
     private final CallCompleter callCompleter;
     private final CandidateResolver candidateResolver;
     private final TaskPrioritizer taskPrioritizer;
@@ -226,7 +226,7 @@ public class InjectorForReplWithJava {
         this.qualifiedExpressionResolver = new QualifiedExpressionResolver();
         this.lazinessToken = new LazinessToken();
         this.typeResolver = new TypeResolver(annotationResolver, qualifiedExpressionResolver, module, javaFlexibleTypeCapabilitiesProvider, storageManager, lazinessToken, dynamicTypesSettings);
-        this.partialBodyResolveProvider = new PartialBodyResolveProvider();
+        this.expressionFilter = new ExpressionFilter();
         this.candidateResolver = new CandidateResolver();
         this.callCompleter = new CallCompleter(argumentTypeResolver, candidateResolver);
         this.taskPrioritizer = new TaskPrioritizer(storageManager);
@@ -306,7 +306,7 @@ public class InjectorForReplWithJava {
         expressionTypingServices.setCallExpressionResolver(callExpressionResolver);
         expressionTypingServices.setCallResolver(callResolver);
         expressionTypingServices.setDescriptorResolver(descriptorResolver);
-        expressionTypingServices.setPartialBodyResolveProvider(partialBodyResolveProvider);
+        expressionTypingServices.setExpressionFilter(expressionFilter);
         expressionTypingServices.setProject(project);
         expressionTypingServices.setTypeResolver(typeResolver);
 

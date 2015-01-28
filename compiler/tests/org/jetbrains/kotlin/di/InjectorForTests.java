@@ -41,7 +41,7 @@ import org.jetbrains.kotlin.types.expressions.ForLoopConventionsChecker;
 import org.jetbrains.kotlin.types.expressions.LocalClassifierAnalyzer;
 import org.jetbrains.kotlin.types.reflect.ReflectionTypes;
 import org.jetbrains.kotlin.resolve.calls.CallExpressionResolver;
-import org.jetbrains.kotlin.resolve.PartialBodyResolveProvider;
+import org.jetbrains.kotlin.resolve.ExpressionFilter;
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver;
 import org.jetbrains.kotlin.resolve.TypeResolver.FlexibleTypeCapabilitiesProvider;
 import org.jetbrains.kotlin.context.LazinessToken;
@@ -77,7 +77,7 @@ public class InjectorForTests {
     private final LocalClassifierAnalyzer localClassifierAnalyzer;
     private final ReflectionTypes reflectionTypes;
     private final CallExpressionResolver callExpressionResolver;
-    private final PartialBodyResolveProvider partialBodyResolveProvider;
+    private final ExpressionFilter expressionFilter;
     private final QualifiedExpressionResolver qualifiedExpressionResolver;
     private final FlexibleTypeCapabilitiesProvider flexibleTypeCapabilitiesProvider;
     private final LazinessToken lazinessToken;
@@ -114,7 +114,7 @@ public class InjectorForTests {
         this.localClassifierAnalyzer = new LocalClassifierAnalyzer();
         this.reflectionTypes = new ReflectionTypes(moduleDescriptor);
         this.callExpressionResolver = new CallExpressionResolver();
-        this.partialBodyResolveProvider = new PartialBodyResolveProvider();
+        this.expressionFilter = new ExpressionFilter();
 
         this.descriptorResolver.setAnnotationResolver(annotationResolver);
         this.descriptorResolver.setBuiltIns(kotlinBuiltIns);
@@ -128,7 +128,7 @@ public class InjectorForTests {
         this.expressionTypingServices.setCallExpressionResolver(callExpressionResolver);
         this.expressionTypingServices.setCallResolver(callResolver);
         this.expressionTypingServices.setDescriptorResolver(descriptorResolver);
-        this.expressionTypingServices.setPartialBodyResolveProvider(partialBodyResolveProvider);
+        this.expressionTypingServices.setExpressionFilter(expressionFilter);
         this.expressionTypingServices.setProject(project);
         this.expressionTypingServices.setTypeResolver(typeResolver);
 

@@ -27,7 +27,7 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.JetNodeTypes
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import org.jetbrains.kotlin.psi.psiUtil.isAncestor
-import org.jetbrains.kotlin.resolve.PartialBodyResolveProvider
+import org.jetbrains.kotlin.resolve.ExpressionFilter
 import org.jetbrains.kotlin.psi.psiUtil.isProbablyNothing
 
 //TODO: do resolve anonymous object's body
@@ -37,12 +37,14 @@ class PartialBodyResolveFilter(
         private val declaration: JetDeclaration,
         probablyNothingCallableNames: ProbablyNothingCallableNames,
         forCompletion: Boolean
-) : PartialBodyResolveProvider() {
+) : ExpressionFilter() {
 
     private val statementMarks = StatementMarks()
 
     private val nothingFunctionNames = HashSet(probablyNothingCallableNames.functionNames())
     private val nothingVariableNames = HashSet(probablyNothingCallableNames.propertyNames())
+
+    override val filter: ((JetElement) -> Boolean)? = { it is JetExpression && statementMarks.statementMark(it) != MarkLevel.SKIP }
 
     ;{
         assert(declaration.isAncestor(elementToResolve))
@@ -76,13 +78,6 @@ class PartialBodyResolveFilter(
         statementMarks.mark(elementToResolve, if (forCompletion) MarkLevel.NEED_COMPLETION else MarkLevel.NEED_REFERENCE_RESOLVE)
         declaration.blocks().forEach { processBlock(it) }
     }
-
-    override fun filterBlock(block: JetBlockExpression): List<JetElement> {
-        if (block is JetPsiUtil.JetExpressionWrapper) return block.getStatements()
-        return block.getStatements().filter { it is JetExpression && statementMarks.statementMark(it) != MarkLevel.SKIP }
-    }
-
-    override fun getLastStatementInABlock(block: JetBlockExpression) = filterBlock(block).lastOrNull()
 
     //TODO: do..while is special case
 

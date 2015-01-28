@@ -279,9 +279,9 @@ public class CandidateResolver {
     ) {
         JetExpression argumentExpression = valueArgument.getArgumentExpression();
         if (argumentExpression == null) return;
-        if (!ArgumentTypeResolver.isFunctionLiteralArgument(argumentExpression)) return;
+        if (!ArgumentTypeResolver.isFunctionLiteralArgument(argumentExpression, context)) return;
 
-        JetFunctionLiteralExpression functionLiteralExpression = ArgumentTypeResolver.getFunctionLiteralArgument(argumentExpression);
+        JetFunctionLiteralExpression functionLiteralExpression = ArgumentTypeResolver.getFunctionLiteralArgument(argumentExpression, context);
 
         JetType effectiveExpectedType = getEffectiveExpectedType(valueParameterDescriptor, valueArgument);
         JetType expectedType = constraintSystem.getCurrentSubstitutor().substitute(effectiveExpectedType, Variance.INVARIANT);
@@ -436,7 +436,7 @@ public class CandidateResolver {
             @Nullable JetExpression argumentExpression,
             @NotNull ResolutionContext context
     ) {
-        JetExpression deparenthesizedArgument = deparenthesizeArgument(argumentExpression, context.partialBodyResolveProvider);
+        JetExpression deparenthesizedArgument = deparenthesizeArgument(argumentExpression, context);
         if (deparenthesizedArgument == null || type == null) return type;
 
         DataFlowValue dataFlowValue = DataFlowValueFactory.createDataFlowValue(deparenthesizedArgument, type, context.trace.getBindingContext());

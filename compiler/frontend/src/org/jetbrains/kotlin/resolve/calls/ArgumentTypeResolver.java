@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
-import org.jetbrains.kotlin.descriptors.CallableDescriptor;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
 import org.jetbrains.kotlin.diagnostics.Errors;
 import org.jetbrains.kotlin.psi.*;
@@ -119,7 +118,7 @@ public class ArgumentTypeResolver {
 
         for (ValueArgument valueArgument : context.call.getValueArguments()) {
             JetExpression argumentExpression = valueArgument.getArgumentExpression();
-            if (argumentExpression != null && isFunctionLiteralArgument(argumentExpression)) {
+            if (argumentExpression != null && isFunctionLiteralArgument(argumentExpression, context)) {
                 checkArgumentTypeWithNoCallee(context, argumentExpression);
             }
         }
@@ -130,20 +129,26 @@ public class ArgumentTypeResolver {
         updateResultArgumentTypeIfNotDenotable(context, argumentExpression);
     }
 
-    public static boolean isFunctionLiteralArgument(@NotNull JetExpression expression) {
-        return getFunctionLiteralArgumentIfAny(expression) != null;
+    public static boolean isFunctionLiteralArgument(
+            @NotNull JetExpression expression, @NotNull ResolutionContext context
+    ) {
+        return getFunctionLiteralArgumentIfAny(expression, context) != null;
     }
 
     @NotNull
-    public static JetFunctionLiteralExpression getFunctionLiteralArgument(@NotNull JetExpression expression) {
-        assert isFunctionLiteralArgument(expression);
+    public static JetFunctionLiteralExpression getFunctionLiteralArgument(
+            @NotNull JetExpression expression, @NotNull ResolutionContext context
+    ) {
+        assert isFunctionLiteralArgument(expression, context);
         //noinspection ConstantConditions
-        return getFunctionLiteralArgumentIfAny(expression);
+        return getFunctionLiteralArgumentIfAny(expression, context);
     }
 
     @Nullable
-    private static JetFunctionLiteralExpression getFunctionLiteralArgumentIfAny(@NotNull JetExpression expression) {
-        JetExpression deparenthesizedExpression = deparenthesizeArgument(expression, null);
+    private static JetFunctionLiteralExpression getFunctionLiteralArgumentIfAny(
+            @NotNull JetExpression expression, @NotNull ResolutionContext context
+    ) {
+        JetExpression deparenthesizedExpression = deparenthesizeArgument(expression, context);
         if (deparenthesizedExpression instanceof JetFunctionLiteralExpression) {
             return (JetFunctionLiteralExpression) deparenthesizedExpression;
         }
@@ -153,7 +158,7 @@ public class ArgumentTypeResolver {
     @Nullable
     public static JetExpression deparenthesizeArgument(
             @Nullable JetExpression expression,
-            @Nullable PartialBodyResolveProvider partialBodyResolveProvider
+            @NotNull ResolutionContext context
     ) {
         JetExpression deparenthesizedExpression = JetPsiUtil.deparenthesize(expression, false);
         if (deparenthesizedExpression instanceof JetBlockExpression) {
@@ -162,11 +167,9 @@ public class ArgumentTypeResolver {
             // This case is a temporary hack for 'if' branches.
             // The right way to implement this logic is to interpret 'if' branches as function literals with explicitly-typed signatures
             // (no arguments and no receiver) and therefore analyze them straight away (not in the 'complete' phase).
-            JetElement lastStatementInABlock = partialBodyResolveProvider != null
-                                               ? partialBodyResolveProvider.getLastStatementInABlock(blockExpression)
-                                               : JetPsiUtil.getLastStatementInABlock(blockExpression);
+            JetElement lastStatementInABlock = ResolvePackage.getLastStatementInABlock(context.expressionFilter, blockExpression);
             if (lastStatementInABlock instanceof JetExpression) {
-                return deparenthesizeArgument((JetExpression) lastStatementInABlock, partialBodyResolveProvider);
+                return deparenthesizeArgument((JetExpression) lastStatementInABlock, context);
             }
         }
         return deparenthesizedExpression;
@@ -181,8 +184,8 @@ public class ArgumentTypeResolver {
         if (expression == null) {
             return JetTypeInfo.create(null, context.dataFlowInfo);
         }
-        if (isFunctionLiteralArgument(expression)) {
-            return getFunctionLiteralTypeInfo(expression, getFunctionLiteralArgument(expression), context, resolveArgumentsMode);
+        if (isFunctionLiteralArgument(expression, context)) {
+            return getFunctionLiteralTypeInfo(expression, getFunctionLiteralArgument(expression, context), context, resolveArgumentsMode);
         }
         JetTypeInfo recordedTypeInfo = getRecordedTypeInfo(expression, context.trace.getBindingContext());
         if (recordedTypeInfo != null) {
@@ -272,7 +275,7 @@ public class ArgumentTypeResolver {
             if (type.getConstructor() instanceof IntegerValueTypeConstructor) {
                 IntegerValueTypeConstructor constructor = (IntegerValueTypeConstructor) type.getConstructor();
                 JetType primitiveType = TypeUtils.getPrimitiveNumberType(constructor, context.expectedType);
-                updateNumberType(primitiveType, expression, context.trace, context.partialBodyResolveProvider);
+                updateNumberType(primitiveType, expression, context);
                 return primitiveType;
             }
         }
@@ -282,20 +285,19 @@ public class ArgumentTypeResolver {
     public static void updateNumberType(
             @NotNull JetType numberType,
             @Nullable JetExpression expression,
-            @NotNull BindingTrace trace,
-            @Nullable PartialBodyResolveProvider partialBodyResolveProvider
+            @NotNull ResolutionContext context
     ) {
         if (expression == null) return;
-        BindingContextUtils.updateRecordedType(numberType, expression, trace, false);
+        BindingContextUtils.updateRecordedType(numberType, expression, context.trace, false);
 
         if (!(expression instanceof JetConstantExpression)) {
-            JetExpression deparenthesized = deparenthesizeArgument(expression, partialBodyResolveProvider);
+            JetExpression deparenthesized = deparenthesizeArgument(expression, context);
             if (deparenthesized != expression) {
-                updateNumberType(numberType, deparenthesized, trace, partialBodyResolveProvider);
+                updateNumberType(numberType, deparenthesized, context);
             }
             return;
         }
 
-        ConstantExpressionEvaluator.OBJECT$.evaluate(expression, trace, numberType);
+        ConstantExpressionEvaluator.OBJECT$.evaluate(expression, context.trace, numberType);
     }
 }

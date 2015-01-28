@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.types.expressions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.resolve.BindingTrace;
-import org.jetbrains.kotlin.resolve.PartialBodyResolveProvider;
+import org.jetbrains.kotlin.resolve.ExpressionFilter;
 import org.jetbrains.kotlin.resolve.calls.context.ContextDependency;
 import org.jetbrains.kotlin.resolve.calls.context.ResolutionContext;
 import org.jetbrains.kotlin.resolve.calls.context.ResolutionResultsCache;
@@ -42,14 +42,14 @@ public class ExpressionTypingContext extends ResolutionContext<ExpressionTypingC
     ) {
         return newContext(trace, scope, dataFlowInfo, expectedType,
                           ContextDependency.INDEPENDENT, new ResolutionResultsCacheImpl(),
-                          expressionTypingServices.getCallChecker(), null, false);
+                          expressionTypingServices.getCallChecker(), ExpressionFilter.NONE, false);
     }
 
     @NotNull
     public static ExpressionTypingContext newContext(@NotNull ResolutionContext context) {
         return new ExpressionTypingContext(
                 context.trace, context.scope, context.dataFlowInfo, context.expectedType,
-                context.contextDependency, context.resolutionResultsCache, context.callChecker, context.partialBodyResolveProvider,
+                context.contextDependency, context.resolutionResultsCache, context.callChecker, context.expressionFilter,
                 context.isAnnotationContext, context.collectAllCandidates
         );
     }
@@ -63,12 +63,12 @@ public class ExpressionTypingContext extends ResolutionContext<ExpressionTypingC
             @NotNull ContextDependency contextDependency,
             @NotNull ResolutionResultsCache resolutionResultsCache,
             @NotNull CallChecker callChecker,
-            @Nullable PartialBodyResolveProvider partialBodyResolveProvider,
+            @NotNull ExpressionFilter expressionFilter,
             boolean isAnnotationContext
     ) {
         return new ExpressionTypingContext(
                 trace, scope, dataFlowInfo, expectedType, contextDependency, resolutionResultsCache, callChecker,
-                partialBodyResolveProvider, isAnnotationContext, false);
+                expressionFilter, isAnnotationContext, false);
     }
 
     private CompileTimeConstantChecker compileTimeConstantChecker;
@@ -81,12 +81,12 @@ public class ExpressionTypingContext extends ResolutionContext<ExpressionTypingC
             @NotNull ContextDependency contextDependency,
             @NotNull ResolutionResultsCache resolutionResultsCache,
             @NotNull CallChecker callChecker,
-            @Nullable PartialBodyResolveProvider partialBodyResolveProvider,
+            @NotNull ExpressionFilter expressionFilter,
             boolean isAnnotationContext,
             boolean collectAllCandidates
     ) {
         super(trace, scope, expectedType, dataFlowInfo, contextDependency, resolutionResultsCache, callChecker,
-              partialBodyResolveProvider, isAnnotationContext, collectAllCandidates);
+              expressionFilter, isAnnotationContext, collectAllCandidates);
     }
 
     @Override
@@ -97,12 +97,12 @@ public class ExpressionTypingContext extends ResolutionContext<ExpressionTypingC
             @NotNull JetType expectedType,
             @NotNull ContextDependency contextDependency,
             @NotNull ResolutionResultsCache resolutionResultsCache,
-            @Nullable PartialBodyResolveProvider partialBodyResolveProvider,
+            @NotNull ExpressionFilter expressionFilter,
             boolean collectAllCandidates
     ) {
         return new ExpressionTypingContext(trace, scope, dataFlowInfo,
                                            expectedType, contextDependency, resolutionResultsCache, callChecker,
-                                           partialBodyResolveProvider, isAnnotationContext, collectAllCandidates);
+                                           expressionFilter, isAnnotationContext, collectAllCandidates);
     }
 
 ///////////// LAZY ACCESSORS

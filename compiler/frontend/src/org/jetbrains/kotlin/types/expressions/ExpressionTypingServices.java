@@ -19,8 +19,6 @@ package org.jetbrains.kotlin.types.expressions;
 import com.google.common.base.Function;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.tree.IElementType;
-import kotlin.Function1;
-import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.analyzer.AnalyzerPackage;
@@ -67,7 +65,7 @@ public class ExpressionTypingServices {
     private DescriptorResolver descriptorResolver;
     private TypeResolver typeResolver;
     private AnnotationResolver annotationResolver;
-    private PartialBodyResolveProvider partialBodyResolveProvider;
+    private ExpressionFilter expressionFilter;
     private KotlinBuiltIns builtIns;
 
     @NotNull
@@ -131,13 +129,13 @@ public class ExpressionTypingServices {
     }
 
     @NotNull
-    private PartialBodyResolveProvider getPartialBodyResolveProvider() {
-        return partialBodyResolveProvider;
+    private ExpressionFilter getExpressionFilter() {
+        return expressionFilter;
     }
 
     @Inject
-    public void setPartialBodyResolveProvider(@NotNull PartialBodyResolveProvider partialBodyResolveProvider) {
-        this.partialBodyResolveProvider = partialBodyResolveProvider;
+    public void setExpressionFilter(@NotNull ExpressionFilter expressionFilter) {
+        this.expressionFilter = expressionFilter;
     }
 
     @Inject
@@ -210,7 +208,7 @@ public class ExpressionTypingServices {
             @NotNull CoercionStrategy coercionStrategyForLastExpression,
             @NotNull ExpressionTypingContext context
     ) {
-        List<JetElement> block = getPartialBodyResolveProvider().filterBlock(expression);
+        List<JetElement> block = ResolvePackage.filterStatements(getExpressionFilter(), expression);
 
         // SCRIPT: get code descriptor for script declaration
         DeclarationDescriptor containingDescriptor = context.scope.getContainingDeclaration();
@@ -231,7 +229,7 @@ public class ExpressionTypingServices {
         }
         else {
             r = getBlockReturnedTypeWithWritableScope(scope, block, coercionStrategyForLastExpression,
-                                                      context.replacePartialBodyResolveProvider(getPartialBodyResolveProvider()));
+                                                      context.replaceExpressionFilter(getExpressionFilter()));
         }
         scope.changeLockLevel(WritableScope.LockLevel.READING);
 

@@ -243,7 +243,7 @@ private fun generatorForBodyResolve() =
             parameter<BindingTrace>()
             parameter<ModuleDescriptor>(useAsContext = true)
             parameter<AdditionalCheckerProvider>()
-            parameter<PartialBodyResolveProvider>()
+            parameter<ExpressionFilter>()
 
             publicField<BodyResolver>()
         }
